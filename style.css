@@ -164,6 +164,31 @@ body {
   justify-content: center;
 }
 
+/* ===== TEXT EDITING ===== */
+.text-input {
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+  color: #333;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  padding: 2px 4px;
+  min-width: 30px;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+.text-input:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
+}
+
+.syllable.editing {
+  background-color: rgba(0, 123, 255, 0.1);
+  transform: scale(1.02);
+}
+
 /* ===== BOTTOM CONTROLS ===== */
 .bottom-controls-group {
   position: fixed;
@@ -287,29 +312,127 @@ body {
   gap: 4px;
 }
 
+/* Hidden checkbox - no styling needed since it's hidden */
 .edit-controls input[type="checkbox"] {
-  transform: scale(1.2);
+  display: none;
 }
 
-.toggle-btn {
+/* ===== ICON BUTTONS (Menu) ===== */
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  outline: none;
+  min-width: 32px;
+  height: 32px;
+}
+
+.icon-btn .glasses-icon {
+  transition: all 0.3s ease;
+  color: #007bff;
+}
+
+/* Default state - no special glow */
+.icon-btn:not(.active) .glasses-icon {
+  color: #007bff;
+  filter: none;
+}
+
+/* Active state - tight green glow directly around glasses */
+.icon-btn.active .glasses-icon {
+  color: #007bff;
+  filter: drop-shadow(0 0 3px #00ff00) 
+          drop-shadow(0 0 6px #00ff00) 
+          drop-shadow(0 0 9px #00ff00);
+}
+
+/* Hover effects */
+.icon-btn:hover {
+  background: rgba(240, 248, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Enhanced hover effect when active (slightly brighter tight glow) */
+.icon-btn.active:hover .glasses-icon {
+  filter: drop-shadow(0 0 4px #00ff00) 
+          drop-shadow(0 0 8px #00ff00) 
+          drop-shadow(0 0 12px #00ff00);
+}
+
+/* ===== CONSTRUCTION HAT ICON (Edit Button) ===== */
+.icon-btn .construction-hat-icon {
+  transition: all 0.3s ease;
+  color: #6c757d; /* Grey when edit mode is off */
+}
+
+/* Edit mode OFF - grey hat */
+.icon-btn:not(.active) .construction-hat-icon {
+  color: #6c757d;
+  filter: none;
+}
+
+/* Edit mode ON - orange hat with tight glow */
+.icon-btn.active .construction-hat-icon {
+  color: #ff9500; /* Construction orange */
+  filter: drop-shadow(0 0 3px #ff9500) 
+          drop-shadow(0 0 6px #ff9500) 
+          drop-shadow(0 0 9px #ff9500);
+}
+
+/* Enhanced hover effect when active */
+.icon-btn.active:hover .construction-hat-icon {
+  filter: drop-shadow(0 0 4px #ff9500) 
+          drop-shadow(0 0 8px #ff9500) 
+          drop-shadow(0 0 12px #ff9500);
+}
+
+/* ===== ADD SYLLABLE BUTTON ===== */
+.add-btn {
   background-color: #6c757d;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   user-select: none;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.toggle-btn.active {
+.add-btn.active {
   background-color: #007bff;
 }
 
-.toggle-btn:hover {
+.add-btn:hover {
   filter: brightness(1.1);
   transform: scale(1.05);
+}
+
+.add-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.add-btn:disabled:hover {
+  filter: none;
+  transform: none;
 }
 
 .info-icon {
@@ -377,6 +500,7 @@ html {
 
 @media (max-width: 768px) {
   .text { font-size: 16px; }
+  .text-input { font-size: 16px; }
   .note { width: 28px; }
   .syllable { min-width: 36px; scroll-margin: 80px; }
   .arrow-btn { width: 45px; height: 45px; font-size: 18px; }
@@ -388,11 +512,14 @@ html {
   .bottom-controls-group.minimized .minimize-btn { top: -30px; left: 10px; }
   .letter-name { font-size: 24px; top: -24px; }
   .solfege-name { font-size: 14px; }
-  .toggle-btn { font-size: 12px; padding: 3px 6px; }
+  .add-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
+  .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
+  .icon-btn .glasses-icon { width: 24px; height: 16px; }
 }
 
 @media (max-width: 480px) {
   .text { font-size: 14px; }
+  .text-input { font-size: 14px; }
   .note { width: 24px; }
   .syllable { min-width: 32px; scroll-margin: 60px; }
   .arrow-btn { width: 40px; height: 40px; font-size: 16px; }
@@ -405,99 +532,7 @@ html {
   .bottom-controls-group.minimized .minimize-btn { top: -25px; left: 8px; }
   .letter-name { font-size: 20px; top: -20px; }
   .solfege-name { font-size: 12px; }
-  .toggle-btn { font-size: 11px; padding: 2px 5px; }
-}
-/* ===== TEXT EDITING ===== */
-.text-input {
-  font-size: 18px;
-  font-weight: 500;
-  text-align: center;
-  color: #333;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid #007bff;
-  border-radius: 4px;
-  padding: 2px 4px;
-  min-width: 30px;
-  outline: none;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
-}
-
-.text-input:focus {
-  border-color: #0056b3;
-  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
-}
-
-.syllable.editing {
-  background-color: rgba(0, 123, 255, 0.1);
-  transform: scale(1.02);
-}
-
-/* Responsive text input */
-@media (max-width: 768px) {
-  .text-input {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .text-input {
-    font-size: 14px;
-  }
-}
-/* ===== ADD SYLLABLE BUTTON ===== */
-.add-btn {
-  background-color: #6c757d; /* Grey when edit mode is off */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
-  min-width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-btn.active {
-  background-color: #007bff; /* Blue when edit mode is on */
-}
-
-.add-btn:hover {
-  filter: brightness(1.1);
-  transform: scale(1.05);
-}
-
-.add-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-  transform: none;
-}
-
-.add-btn:disabled:hover {
-  filter: none;
-  transform: none;
-}
-
-/* Responsive add button */
-@media (max-width: 768px) {
-  .add-btn {
-    font-size: 16px;
-    min-width: 26px;
-    height: 26px;
-    padding: 3px 6px;
-  }
-}
-
-@media (max-width: 480px) {
-  .add-btn {
-    font-size: 14px;
-    min-width: 24px;
-    height: 24px;
-    padding: 2px 5px;
-  }
+  .add-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
+  .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
+  .icon-btn .glasses-icon { width: 20px; height: 14px; }
 }
