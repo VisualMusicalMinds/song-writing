@@ -58,6 +58,7 @@ const noteToSolfege = {
 
 // ===== ELEMENT REFERENCES =====
 const editModeCheckbox = document.getElementById('editMode');
+const editToggleBtn = document.getElementById('editToggle');
 const leftArrowBtn = document.getElementById('leftArrow');
 const rightArrowBtn = document.getElementById('rightArrow');
 const infoIcon = document.getElementById('infoIcon');
@@ -155,13 +156,11 @@ function updateNoteDisplay(noteElement, noteClass) {
 
 // ===== SYLLABLE CREATION FUNCTIONS =====
 function createNewSyllable() {
-  // Get the colors and letter names for 'Do' in current key
   const colors = noteColorsByKey[currentKey];
   const letterNames = letterNamesByKey[currentKey];
   const doColor = colors['Do'];
   const doLetterName = letterNames['Do'];
   
-  // Create the syllable structure
   const syllableDiv = document.createElement('div');
   syllableDiv.className = 'syllable';
   
@@ -182,7 +181,6 @@ function createNewSyllable() {
   textDiv.className = 'text';
   textDiv.textContent = '-';
   
-  // Assemble the syllable
   noteDiv.appendChild(letterNameDiv);
   noteDiv.appendChild(solfegeNameDiv);
   syllableDiv.appendChild(noteDiv);
@@ -199,11 +197,9 @@ function addSyllableAfterCurrent() {
   let targetLine;
   
   if (currentSyllableIndex >= 0 && currentSyllableIndex < syllables.length) {
-    // Add after the currently highlighted syllable
     targetSyllable = syllables[currentSyllableIndex];
     targetLine = targetSyllable.closest('.notation-line');
   } else {
-    // No syllable selected, add to the last line
     const lines = document.querySelectorAll('.notation-line');
     targetLine = lines[lines.length - 1];
     const lastLineSyllables = targetLine.querySelectorAll('.syllable');
@@ -212,35 +208,24 @@ function addSyllableAfterCurrent() {
   
   if (!targetLine || !targetSyllable) return;
   
-  // Create new syllable
   const newSyllable = createNewSyllable();
-  
-  // Insert after the target syllable
   targetSyllable.insertAdjacentElement('afterend', newSyllable);
-  
-  // Add event listeners to the new syllable
   addSyllableEventListeners(newSyllable);
   
-  // Update the current syllable index to point to the new syllable
   const updatedSyllables = getAllSyllables();
   const newIndex = Array.from(updatedSyllables).indexOf(newSyllable);
   currentSyllableIndex = newIndex;
   
-  // Highlight and scroll to the new syllable
   highlightAndPlaySyllable(currentSyllableIndex);
-  
-  // Apply colors in case the key is not C
   applyNoteColors();
 }
 
 function addSyllableEventListeners(syllable) {
-  // Add click listener to syllable
   syllable.addEventListener('click', (event) => {
     event.stopPropagation();
     handleSyllableClick(syllable);
   });
   
-  // Add click listener to note
   const noteElement = syllable.querySelector('.note');
   if (noteElement) {
     noteElement.addEventListener('click', (event) => {
@@ -249,7 +234,6 @@ function addSyllableEventListeners(syllable) {
     });
   }
   
-  // Add click listener to text
   const textElement = syllable.querySelector('.text');
   if (textElement) {
     textElement.addEventListener('click', (event) => {
@@ -268,7 +252,6 @@ function startTextEdit(textElement) {
   const syllable = textElement.closest('.syllable');
   syllable.classList.add('editing');
   
-  // Track which syllable we're editing
   const syllables = getAllSyllables();
   currentEditingIndex = Array.from(syllables).indexOf(syllable);
   
@@ -278,15 +261,12 @@ function startTextEdit(textElement) {
   input.className = 'text-input';
   input.value = currentText;
   
-  // Replace the text element with input
   textElement.style.display = 'none';
   textElement.parentNode.insertBefore(input, textElement);
   
-  // Focus and select all text
   input.focus();
   input.select();
   
-  // Handle input events
   input.addEventListener('blur', () => {
     if (!isAdvancingToNext) {
       finishTextEdit();
@@ -381,6 +361,26 @@ function cancelTextEdit() {
 }
 
 // ===== TOGGLE FUNCTIONS =====
+function toggleEditMode() {
+  editModeCheckbox.checked = !editModeCheckbox.checked;
+  
+  if (editModeCheckbox.checked) {
+    editToggleBtn.classList.add('active');
+  } else {
+    editToggleBtn.classList.remove('active');
+  }
+  
+  updateAddButtonState();
+}
+
+function syncEditButtonState() {
+  if (editModeCheckbox.checked) {
+    editToggleBtn.classList.add('active');
+  } else {
+    editToggleBtn.classList.remove('active');
+  }
+}
+
 function toggleNames() {
   showNames = !showNames;
   const notationContainer = document.querySelector('.notation-container');
@@ -546,6 +546,7 @@ function handleTextClick(textElement, event) {
 document.addEventListener('DOMContentLoaded', () => {
   applyNoteColors();
   updateAddButtonState();
+  syncEditButtonState();
   document.body.setAttribute('tabindex', '0');
   document.body.focus();
 });
@@ -562,7 +563,13 @@ leftArrowBtn.addEventListener('click', navigateLeft);
 rightArrowBtn.addEventListener('click', navigateRight);
 addBtn.addEventListener('click', addSyllableAfterCurrent);
 
-editModeCheckbox.addEventListener('change', updateAddButtonState);
+// Construction hat edit toggle
+editToggleBtn.addEventListener('click', toggleEditMode);
+
+editModeCheckbox.addEventListener('change', () => {
+  syncEditButtonState();
+  updateAddButtonState();
+});
 
 document.addEventListener('click', (event) => {
   if (currentlyEditingText && !event.target.closest('.syllable.editing') && !isAdvancingToNext) {
