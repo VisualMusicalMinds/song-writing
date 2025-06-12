@@ -130,6 +130,24 @@
         <!-- Control Panel -->
         <div class="bottom-controls">
             <div class="edit-controls">
+                <!-- Key Selector Dropdown -->
+                <div class="control-group">
+                    <select class="key-selector" id="keySelector">
+                        <option value="C">C</option>
+                        <option value="Db">D♭</option>
+                        <option value="D">D</option>
+                        <option value="Eb">E♭</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="Gb">G♭</option>
+                        <option value="G">G</option>
+                        <option value="Ab">A♭</option>
+                        <option value="A">A</option>
+                        <option value="Bb">B♭</option>
+                        <option value="B">B</option>
+                    </select>
+                </div>
+
                 <!-- Edit Mode with Construction Hat -->
                 <div class="control-group">
                     <button class="icon-btn" id="editToggle" title="Edit mode">
@@ -162,6 +180,15 @@
                         </svg>
                     </button>
                 </div>
+
+                <!-- Accidental Toggle Button -->
+                <div class="control-group">
+                    <div class="accidental-toggle" id="accidentalToggle" title="Accidentals: Flat, Natural, Sharp">
+                        <div class="accidental-option" data-type="flat">♭</div>
+                        <div class="accidental-option active" data-type="natural">♮</div>
+                        <div class="accidental-option" data-type="sharp">♯</div>
+                    </div>
+                </div>
                 
                 <!-- Add Syllable Button -->
                 <div class="control-group">
@@ -176,22 +203,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Key Selector (Hidden) -->
-    <select id="keySelector" style="display: none;" onchange="changeKey(this.value)">
-        <option value="C">C Major</option>
-        <option value="Db">Db Major</option>
-        <option value="D">D Major</option>
-        <option value="Eb">Eb Major</option>
-        <option value="E">E Major</option>
-        <option value="F">F Major</option>
-        <option value="Gb">Gb Major</option>
-        <option value="G">G Major</option>
-        <option value="Ab">Ab Major</option>
-        <option value="A">A Major</option>
-        <option value="Bb">Bb Major</option>
-        <option value="B">B Major</option>
-    </select>
 
     <script src="script.js"></script>
 </body>
