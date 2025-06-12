@@ -225,8 +225,21 @@ body {
 .floating-navigation {
   display: flex;
   gap: 20px;
+  align-items: center; /* Ensure vertical alignment */
+  position: relative; /* Allow absolute positioning of minimize button */
 }
 
+/* Position minimize button to the left of navigation arrows */
+.floating-navigation::before {
+  content: '';
+  position: absolute;
+  left: -50px; /* Position to the left of the navigation */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  pointer-events: none; /* This is just for spacing reference */
+}
 .arrow-btn {
   background-color: #007bff;
   color: white;
@@ -276,14 +289,13 @@ body {
 
 /* ===== CONTROL BUTTONS ===== */
 .minimize-btn {
-  position: absolute;
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 4px;
-  width: 20px;
-  height: 16px;
-  font-size: 10px;
+  border-radius: 50%; /* Make it circular like the arrow buttons */
+  width: 30px; /* Slightly smaller than arrow buttons */
+  height: 30px;
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -293,23 +305,26 @@ body {
   font-family: monospace;
   line-height: 1;
   z-index: 160;
-  top: 8px;
-  left: 12px;
-}
-
-.bottom-controls-group.minimized .minimize-btn {
-  background-color: #007bff;
-  top: -35px;
-  left: 12px;
+  box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3); /* Match arrow button shadow style */
 }
 
 .minimize-btn:hover {
   transform: scale(1.1);
   filter: brightness(1.1);
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
 }
 
 .minimize-btn:active {
   transform: scale(0.95);
+}
+
+.bottom-controls-group.minimized .minimize-btn {
+  background-color: #007bff; /* Blue when minimized */
+  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+}
+
+.bottom-controls-group.minimized .minimize-btn:hover {
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
 }
 
 .edit-controls {
@@ -535,6 +550,81 @@ body {
   transform: none;
 }
 
+/* ===== DELETE BUTTON ===== */
+.delete-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn .trash-icon {
+  transition: all 0.3s ease;
+  color: currentColor;
+}
+
+.delete-btn.active {
+  background-color: #dc3545;
+}
+
+.delete-btn.active .trash-icon {
+  color: white;
+}
+
+.delete-btn.confirm-delete {
+  background-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.4),
+              0 0 0 6px rgba(220, 53, 69, 0.2);
+  animation: redPulse 1.5s infinite;
+}
+
+@keyframes redPulse {
+  0% {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.4),
+                0 0 0 6px rgba(220, 53, 69, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(220, 53, 69, 0.6),
+                0 0 0 12px rgba(220, 53, 69, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.4),
+                0 0 0 6px rgba(220, 53, 69, 0.2);
+  }
+}
+
+.delete-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.delete-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  background-color: #6c757d;
+}
+
+.delete-btn:disabled:hover {
+  filter: none;
+  transform: none;
+}
+
+.delete-btn:disabled .trash-icon {
+  color: #aaa;
+}
+
 .info-icon {
   display: inline-flex;
   align-items: center;
@@ -613,6 +703,7 @@ html {
   .letter-name { font-size: 24px; top: -24px; }
   .solfege-name { font-size: 14px; }
   .add-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
+  .delete-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
   .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
   .icon-btn .glasses-icon { width: 24px; height: 16px; }
   .accidental-toggle { font-size: 14px; }
@@ -637,10 +728,231 @@ html {
   .letter-name { font-size: 20px; top: -20px; }
   .solfege-name { font-size: 12px; }
   .add-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
+  .delete-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
   .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
   .icon-btn .glasses-icon { width: 20px; height: 14px; }
   .accidental-toggle { font-size: 12px; }
   .accidental-option { min-width: 14px; height: 24px; padding: 2px 4px; }
   .accidental-symbol { font-size: 13px; } /* Proportionally scaled for small mobile */
   .key-selector { font-size: 11px; min-width: 35px; height: 24px; padding: 2px 5px; padding-right: 18px; background-size: 8px; }
+}
+/* Add these new styles to your CSS file */
+
+/* ===== NEW LINE BUTTON ===== */
+.new-line-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Times New Roman', serif;
+}
+
+.new-line-btn.active {
+  background-color: #007bff;
+}
+
+.new-line-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.new-line-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  background-color: #6c757d;
+}
+
+.new-line-btn:disabled:hover {
+  filter: none;
+  transform: none;
+}
+
+/* ===== NEW LINE POPUP ===== */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.popup-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.popup-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 400px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.popup-overlay.show .popup-content {
+  transform: scale(1);
+}
+
+.popup-content h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.popup-content textarea {
+  width: 100%;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  resize: vertical;
+  min-height: 120px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.popup-content textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.popup-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.submit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.popup-btn:active {
+  transform: scale(0.98);
+}
+
+/* ===== RESPONSIVE UPDATES ===== */
+@media (max-width: 768px) {
+  .new-line-btn { 
+    font-size: 16px; 
+    min-width: 28px; 
+    height: 28px; 
+    padding: 3px 6px; 
+  }
+  
+  .popup-content {
+    min-width: 300px;
+    padding: 20px;
+  }
+  
+  .popup-content h3 {
+    font-size: 18px;
+  }
+  
+  .popup-content textarea {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .new-line-btn { 
+    font-size: 14px; 
+    min-width: 24px; 
+    height: 24px; 
+    padding: 2px 5px; 
+  }
+  
+  .popup-content {
+    min-width: 280px;
+    padding: 16px;
+  }
+  
+  .popup-buttons {
+    flex-direction: column;
+  }
+  
+  .popup-btn {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .minimize-btn { 
+    width: 25px; 
+    height: 25px; 
+    font-size: 10px; 
+  }
+  
+  .floating-navigation::before {
+    left: -40px;
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .minimize-btn { 
+    width: 22px; 
+    height: 22px; 
+    font-size: 9px; 
+  }
+  
+  .floating-navigation::before {
+    left: -35px;
+    width: 22px;
+    height: 22px;
+  }
 }
