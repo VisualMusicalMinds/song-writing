@@ -75,8 +75,14 @@ const minimizeBtn = document.getElementById('minimizeBtn');
 const controlsGroup = document.getElementById('controlsGroup');
 const nameToggle = document.getElementById('nameToggle');
 const addBtn = document.getElementById('addBtn');
+const newLineBtn = document.getElementById('newLineBtn');
+const deleteBtn = document.getElementById('deleteBtn');
 const accidentalToggle = document.getElementById('accidentalToggle');
 const keySelector = document.getElementById('keySelector');
+const newLinePopup = document.getElementById('newLinePopup');
+const newLineText = document.getElementById('newLineText');
+const cancelNewLine = document.getElementById('cancelNewLine');
+const submitNewLine = document.getElementById('submitNewLine');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1; // -1 means nothing is selected
@@ -87,6 +93,7 @@ let controlsMinimized = false;
 let currentlyEditingText = null;
 let currentEditingIndex = -1;
 let isAdvancingToNext = false;
+let deleteConfirmationState = false; // Track if delete button has been pressed once
 const DOUBLE_CLICK_DELAY = 300;
 
 // ===== UTILITY FUNCTIONS =====
@@ -104,6 +111,11 @@ function resetAccidentalToggleVisuals() {
     document.querySelectorAll('.accidental-option').forEach(option => {
         option.classList.remove('active'); // Reset visual state of flat/sharp buttons
     });
+}
+
+function resetDeleteConfirmation() {
+    deleteConfirmationState = false;
+    deleteBtn.classList.remove('confirm-delete');
 }
 
 // ===== FREQUENCY CALCULATION FUNCTIONS =====
@@ -256,7 +268,7 @@ function updateNoteDisplay(noteElement, noteClass) {
 }
 
 // ===== SYLLABLE CREATION FUNCTIONS =====
-function createNewSyllable() {
+function createNewSyllable(syllableText = '-') {
   const doColor = noteColorsByKey[currentKey]['Do'];
   const doLetterName = letterNamesByKey[currentKey]['Do'];
   const syllableDiv = document.createElement('div');
@@ -273,12 +285,46 @@ function createNewSyllable() {
   solfegeNameDiv.textContent = 'do'; 
   const textDiv = document.createElement('div');
   textDiv.className = 'text';
-  textDiv.textContent = '-';
+  textDiv.textContent = syllableText;
   noteDiv.appendChild(letterNameDiv);
   noteDiv.appendChild(solfegeNameDiv);
   syllableDiv.appendChild(noteDiv);
   syllableDiv.appendChild(textDiv);
   return syllableDiv;
+}
+
+function createNewLineFromText(text) {
+  // Split text by spaces and filter out empty strings
+  const syllables = text.trim().split(/\s+/).filter(syllable => syllable.length > 0);
+  
+  if (syllables.length === 0) {
+    console.warn("No syllables found in input text");
+    return;
+  }
+
+  // Create a new notation line
+  const newLine = document.createElement('div');
+  newLine.className = 'notation-line overflow';
+  
+  // Create syllables for each word
+  syllables.forEach(syllableText => {
+    const syllable = createNewSyllable(syllableText);
+    addSyllableEventListeners(syllable);
+    newLine.appendChild(syllable);
+  });
+  
+  // Add the new line to the notation container
+  const notationContainer = document.querySelector('.notation-container');
+  notationContainer.appendChild(newLine);
+  
+  // Activate the first syllable of the new line
+  const firstSyllable = newLine.querySelector('.syllable');
+  if (firstSyllable) {
+    setSyllableAsActive(firstSyllable);
+    scrollToSyllable(firstSyllable);
+  }
+  
+  console.log(`Created new line with ${syllables.length} syllables:`, syllables);
 }
 
 function addSyllableAfterCurrent() {
@@ -304,6 +350,36 @@ function addSyllableAfterCurrent() {
   const updatedSyllables = getAllSyllables();
   // currentSyllableIndex will be set by setSyllableAsActive
   setSyllableAsActive(newSyllable); 
+}
+
+function deleteSyllable() {
+  if (!editModeCheckbox.checked || currentSyllableIndex < 0) return;
+  
+  const syllables = getAllSyllables();
+  if (currentSyllableIndex >= syllables.length) return;
+  
+  const syllableToDelete = syllables[currentSyllableIndex];
+  const syllableParent = syllableToDelete.parentNode;
+  
+  // Remove the syllable from the DOM
+  syllableToDelete.remove();
+  
+  // Update currentSyllableIndex after deletion
+  const remainingSyllables = getAllSyllables();
+  if (remainingSyllables.length === 0) {
+    currentSyllableIndex = -1;
+    navigationOffEndState = null;
+  } else {
+    // If we deleted the last syllable, move to the new last syllable
+    if (currentSyllableIndex >= remainingSyllables.length) {
+      currentSyllableIndex = remainingSyllables.length - 1;
+    }
+    // Highlight the new current syllable
+    setSyllableAsActive(remainingSyllables[currentSyllableIndex]);
+  }
+  
+  // Reset delete confirmation state
+  resetDeleteConfirmation();
 }
 
 function addSyllableEventListeners(syllable) {
@@ -364,6 +440,8 @@ function toggleEditMode() {
   editModeCheckbox.checked = !editModeCheckbox.checked;
   editToggleBtn.classList.toggle('active', editModeCheckbox.checked);
   updateAddButtonState();
+  updateDeleteButtonState();
+  updateNewLineButtonState();
 }
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
@@ -385,11 +463,40 @@ function updateAddButtonState() {
   addBtn.disabled = !editModeCheckbox.checked;
   addBtn.classList.toggle('active', editModeCheckbox.checked);
 }
+function updateDeleteButtonState() {
+  deleteBtn.disabled = !editModeCheckbox.checked || currentSyllableIndex < 0;
+  deleteBtn.classList.toggle('active', editModeCheckbox.checked && currentSyllableIndex >= 0);
+}
+function updateNewLineButtonState() {
+  newLineBtn.disabled = !editModeCheckbox.checked;
+  newLineBtn.classList.toggle('active', editModeCheckbox.checked);
+}
 function changeKey(newKey) {
   if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
     currentKey = newKey; applyNoteColors(); console.log(`Key changed to: ${newKey}`);
     resetAccidentalToggleVisuals(); // Also reset toggle when key changes
   } else console.warn(`Attempted to change to invalid key: ${newKey}`);
+}
+
+// ===== NEW LINE POPUP FUNCTIONS =====
+function showNewLinePopup() {
+  if (!editModeCheckbox.checked) return;
+  newLinePopup.classList.add('show');
+  newLineText.value = '';
+  newLineText.focus();
+}
+
+function hideNewLinePopup() {
+  newLinePopup.classList.remove('show');
+  newLineText.value = '';
+}
+
+function handleNewLineSubmit() {
+  const text = newLineText.value.trim();
+  if (text) {
+    createNewLineFromText(text);
+  }
+  hideNewLinePopup();
 }
 
 // ===== NOTE EDITING FUNCTIONS =====
@@ -418,6 +525,8 @@ function enterDeselectedState(boundary) { // boundary is 'beforeStart' or 'after
     currentSyllableIndex = -1;
     navigationOffEndState = boundary;
     resetAccidentalToggleVisuals(); // Ensure toggle is off and internal state is natural
+    resetDeleteConfirmation(); // Reset delete confirmation when deselecting
+    updateDeleteButtonState(); // Update delete button state
 }
 
 function setSyllableAsActive(syllable) {
@@ -430,6 +539,7 @@ function setSyllableAsActive(syllable) {
     // Reset toggle if it's a new note selection OR if we were in an "off-end" state and now selecting a note
     if (isNewNoteBeingSelected || navigationOffEndState !== null) {
       resetAccidentalToggleVisuals();
+      resetDeleteConfirmation(); // Reset delete confirmation when selecting a new note
     }
 
     currentSyllableIndex = newIndex;
@@ -442,6 +552,9 @@ function setSyllableAsActive(syllable) {
     scrollToSyllable(currentSyllableElement);
     const noteElement = currentSyllableElement.querySelector('.note');
     if (noteElement) playNoteWithAccidental(noteElement);
+    
+    // Update delete button state
+    updateDeleteButtonState();
   }
 }
 
@@ -495,19 +608,27 @@ function editCurrentNote(direction) {
 // ===== EVENT HANDLERS =====
 function handleNoteClick(noteElement) {
   const syllable = noteElement.closest('.syllable');
-  setSyllableAsActive(syllable); 
-  // Double click logic for diatonic change (also resets accidental toggle via changeNote)
-  if (editModeCheckbox.checked && Array.from(getAllSyllables()).indexOf(syllable) === currentSyllableIndex) {
-       if (clickTimer) { 
-           clearTimeout(clickTimer); 
-           clickTimer = null; 
-           changeNote(noteElement, 'down', true); 
-       } else { 
-           clickTimer = setTimeout(() => { 
-               changeNote(noteElement, 'up', true); 
-               clickTimer = null; 
-           }, DOUBLE_CLICK_DELAY); 
-       }
+  const syllableIndex = Array.from(getAllSyllables()).indexOf(syllable);
+  
+  // First, activate the syllable if it's not already active
+  if (syllableIndex !== currentSyllableIndex) {
+    setSyllableAsActive(syllable);
+    return; // Exit early - only activate on first click
+  }
+  
+  // If we get here, the syllable is already active, so handle note changing
+  if (editModeCheckbox.checked) {
+    // Double click logic for diatonic change (also resets accidental toggle via changeNote)
+    if (clickTimer) { 
+      clearTimeout(clickTimer); 
+      clickTimer = null; 
+      changeNote(noteElement, 'down', true); 
+    } else { 
+      clickTimer = setTimeout(() => { 
+        changeNote(noteElement, 'up', true); 
+        clickTimer = null; 
+      }, DOUBLE_CLICK_DELAY); 
+    }
   }
 }
 
@@ -519,13 +640,36 @@ function handleTextClick(textElement, event) {
   if (editModeCheckbox.checked && !currentlyEditingText) { event.stopPropagation(); startTextEdit(textElement); }
 }
 
+function handleDeleteClick() {
+  if (!editModeCheckbox.checked || currentSyllableIndex < 0) return;
+  
+  if (!deleteConfirmationState) {
+    // First click - show confirmation state (red glow)
+    deleteConfirmationState = true;
+    deleteBtn.classList.add('confirm-delete');
+    
+    // Auto-reset after 3 seconds if no second click
+    setTimeout(() => {
+      if (deleteConfirmationState) {
+        resetDeleteConfirmation();
+      }
+    }, 3000);
+  } else {
+    // Second click - actually delete the syllable
+    deleteSyllable();
+  }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   accidentalMode = 'natural'; 
   currentSyllableIndex = -1; // Start with no note selected
   navigationOffEndState = null; // Start with no boundary state
+  deleteConfirmationState = false; // Start with no delete confirmation
   applyNoteColors(); 
   updateAddButtonState(); 
+  updateDeleteButtonState();
+  updateNewLineButtonState();
   syncEditButtonState(); 
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
@@ -539,13 +683,37 @@ nameToggle.addEventListener('click', toggleNames);
 leftArrowBtn.addEventListener('click', navigateLeft);
 rightArrowBtn.addEventListener('click', navigateRight);
 addBtn.addEventListener('click', addSyllableAfterCurrent);
+newLineBtn.addEventListener('click', showNewLinePopup);
+deleteBtn.addEventListener('click', handleDeleteClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
+
+// New line popup event listeners
+cancelNewLine.addEventListener('click', hideNewLinePopup);
+submitNewLine.addEventListener('click', handleNewLineSubmit);
+
+// Close popup when clicking outside
+newLinePopup.addEventListener('click', (event) => {
+  if (event.target === newLinePopup) {
+    hideNewLinePopup();
+  }
+});
+
+// Handle escape key in popup
+newLineText.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    hideNewLinePopup();
+  }
+});
 
 editModeCheckbox.addEventListener('change', () => { 
   syncEditButtonState(); 
   updateAddButtonState(); 
+  updateDeleteButtonState();
+  updateNewLineButtonState();
   if (!editModeCheckbox.checked) { // If turning edit mode off, reset toggle and boundary state
     resetAccidentalToggleVisuals();
+    resetDeleteConfirmation();
+    hideNewLinePopup();
     navigationOffEndState = null; 
     // Optionally, deselect current note too if desired when exiting edit mode
     // if (currentSyllableIndex !== -1) enterDeselectedState(null); // This would deselect the note
@@ -594,6 +762,10 @@ accidentalToggle.addEventListener('click', (event) => {
 keySelector.addEventListener('change', (event) => changeKey(event.target.value));
 document.addEventListener('click', (event) => {
   if (currentlyEditingText && !event.target.closest('.syllable.editing') && !isAdvancingToNext) finishTextEdit();
+  // Reset delete confirmation if clicking elsewhere
+  if (!event.target.closest('#deleteBtn') && deleteConfirmationState) {
+    resetDeleteConfirmation();
+  }
 });
 document.addEventListener('keydown', (event) => {
   if (currentlyEditingText) return;
@@ -602,5 +774,12 @@ document.addEventListener('keydown', (event) => {
     case 'ArrowRight': event.preventDefault(); navigateRight(); break;
     case 'ArrowUp': event.preventDefault(); editCurrentNote('up'); break;
     case 'ArrowDown': event.preventDefault(); editCurrentNote('down'); break;
+    case 'Delete':
+    case 'Backspace':
+      if (editModeCheckbox.checked && currentSyllableIndex >= 0) {
+        event.preventDefault();
+        handleDeleteClick();
+      }
+      break;
   }
 });
