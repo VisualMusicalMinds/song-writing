@@ -32,10 +32,34 @@ const letterNamesByKey = {
   'B': { 'Do': 'B', 'Re': 'C#', 'Mi': 'D#', 'Fa': 'E', 'So': 'F#', 'La': 'G#', 'Ti': 'A#' }
 };
 
+// ===== CHORD COLOR MAPPING =====
+const chordColorMapping = {
+  'I': 'Do',      'ii': 'Re',     'iii': 'Mi',    'IV': 'Fa',     'V': 'So',      'vi': 'La',     
+  'V/V': 'Re',    'V/vi': 'Mi',   'IV/IV': 'Ti'
+};
+
+// ===== CHORD NAME MAPPING =====
+const chordNamesByKey = {
+  'C': { 'I': 'C', 'ii': 'Dm', 'iii': 'Em', 'IV': 'F', 'V': 'G', 'vi': 'Am', 'V/V': 'D', 'V/vi': 'E', 'IV/IV': 'Bb' },
+  'Db': { 'I': 'Db', 'ii': 'Ebm', 'iii': 'Fm', 'IV': 'Gb', 'V': 'Ab', 'vi': 'Bbm', 'V/V': 'Eb', 'V/vi': 'F', 'IV/IV': 'B' },
+  'D': { 'I': 'D', 'ii': 'Em', 'iii': 'F#m', 'IV': 'G', 'V': 'A', 'vi': 'Bm', 'V/V': 'E', 'V/vi': 'F#', 'IV/IV': 'C' },
+  'Eb': { 'I': 'Eb', 'ii': 'Fm', 'iii': 'Gm', 'IV': 'Ab', 'V': 'Bb', 'vi': 'Cm', 'V/V': 'F', 'V/vi': 'G', 'IV/IV': 'Db' },
+  'E': { 'I': 'E', 'ii': 'F#m', 'iii': 'G#m', 'IV': 'A', 'V': 'B', 'vi': 'C#m', 'V/V': 'F#', 'V/vi': 'G#', 'IV/IV': 'D' },
+  'F': { 'I': 'F', 'ii': 'Gm', 'iii': 'Am', 'IV': 'Bb', 'V': 'C', 'vi': 'Dm', 'V/V': 'G', 'V/vi': 'A', 'IV/IV': 'Eb' },
+  'Gb': { 'I': 'Gb', 'ii': 'Abm', 'iii': 'Bbm', 'IV': 'B', 'V': 'Db', 'vi': 'Ebm', 'V/V': 'Ab', 'V/vi': 'Bb', 'IV/IV': 'E' },
+  'G': { 'I': 'G', 'ii': 'Am', 'iii': 'Bm', 'IV': 'C', 'V': 'D', 'vi': 'Em', 'V/V': 'A', 'V/vi': 'B', 'IV/IV': 'F' },
+  'Ab': { 'I': 'Ab', 'ii': 'Bbm', 'iii': 'Cm', 'IV': 'Db', 'V': 'Eb', 'vi': 'Fm', 'V/V': 'Bb', 'V/vi': 'C', 'IV/IV': 'Gb' },
+  'A': { 'I': 'A', 'ii': 'Bm', 'iii': 'C#m', 'IV': 'D', 'V': 'E', 'vi': 'F#m', 'V/V': 'B', 'V/vi': 'C#', 'IV/IV': 'G' },
+  'Bb': { 'I': 'Bb', 'ii': 'Cm', 'iii': 'Dm', 'IV': 'Eb', 'V': 'F', 'vi': 'Gm', 'V/V': 'C', 'V/vi': 'D', 'IV/IV': 'Ab' },
+  'B': { 'I': 'B', 'ii': 'C#m', 'iii': 'D#m', 'IV': 'E', 'V': 'F#', 'vi': 'G#m', 'V/V': 'C#', 'V/vi': 'D#', 'IV/IV': 'A' }
+};
+
 // ===== MUSICAL DATA & CONSTANTS =====
 let currentKey = 'C';
 let showNames = false;
 let accidentalMode = 'natural'; 
+let chordMode = false;
+let selectedChord = null;
 
 const A4_HZ = 440.0;
 const SEMITONES_IN_OCTAVE = 12;
@@ -84,17 +108,19 @@ const newLineText = document.getElementById('newLineText');
 const cancelNewLine = document.getElementById('cancelNewLine');
 const submitNewLine = document.getElementById('submitNewLine');
 const editOnlyControls = document.getElementById('editOnlyControls');
+const chordToggle = document.getElementById('chordToggle');
+const chordBoxes = document.getElementById('chordBoxes');
 
 // ===== STATE VARIABLES =====
-let currentSyllableIndex = -1; // -1 means nothing is selected
-let navigationOffEndState = null; // null, 'beforeStart', or 'afterEnd'
+let currentSyllableIndex = -1;
+let navigationOffEndState = null;
 let clickTimer = null;
 let infoVisible = false;
 let controlsMinimized = false;
 let currentlyEditingText = null;
 let currentEditingIndex = -1;
 let isAdvancingToNext = false;
-let deleteConfirmationState = false; // Track if delete button has been pressed once
+let deleteConfirmationState = false;
 const DOUBLE_CLICK_DELAY = 300;
 
 // ===== UTILITY FUNCTIONS =====
@@ -108,9 +134,9 @@ function scrollToSyllable(syllable) {
 }
 
 function resetAccidentalToggleVisuals() {
-    accidentalMode = 'natural'; // Reset internal state of the toggle
+    accidentalMode = 'natural';
     document.querySelectorAll('.accidental-option').forEach(option => {
-        option.classList.remove('active'); // Reset visual state of flat/sharp buttons
+        option.classList.remove('active');
     });
 }
 
@@ -125,6 +151,69 @@ function updateEditOnlyControlsVisibility() {
     editOnlyControls.classList.add('show');
   } else {
     editOnlyControls.classList.remove('show');
+  }
+}
+
+// ===== CHORD FUNCTIONS =====
+function updateChordBoxesVisibility() {
+  if (chordMode) {
+    chordBoxes.classList.add('show');
+    document.body.classList.add('chord-mode-active');
+  } else {
+    chordBoxes.classList.remove('show');
+    document.body.classList.remove('chord-mode-active');
+    selectedChord = null;
+    document.querySelectorAll('.chord-box').forEach(box => box.classList.remove('selected'));
+  }
+}
+
+function applyChordColors() {
+  const colors = noteColorsByKey[currentKey];
+  
+  document.querySelectorAll('.chord-box').forEach(chordBox => {
+    const chordName = chordBox.getAttribute('data-chord');
+    const solfegeKey = chordColorMapping[chordName];
+    
+    if (solfegeKey && colors[solfegeKey]) {
+      const color = colors[solfegeKey];
+      chordBox.style.backgroundColor = color;
+      chordBox.style.borderColor = color;
+    }
+  });
+}
+
+function updateChordBoxLabels() {
+  const chordNames = chordNamesByKey[currentKey];
+  
+  document.querySelectorAll('.chord-box').forEach(chordBox => {
+    const romanNumeral = chordBox.getAttribute('data-chord');
+    const chordName = chordNames[romanNumeral];
+    
+    if (showNames && chordName) {
+      chordBox.textContent = chordName;
+    } else {
+      chordBox.textContent = romanNumeral;
+    }
+  });
+}
+
+function handleChordBoxClick(chordBox) {
+  const chordName = chordBox.getAttribute('data-chord');
+  
+  document.querySelectorAll('.chord-box').forEach(box => box.classList.remove('selected'));
+  
+  chordBox.classList.add('selected');
+  selectedChord = chordName;
+  
+  console.log(`Selected chord: ${chordName}`);
+}
+
+function selectChordByKeyNumber(keyNumber) {
+  if (!chordMode) return; // Only work if chord mode is active
+  
+  const chordBox = document.querySelector(`[data-key="${keyNumber}"]`);
+  if (chordBox) {
+    handleChordBoxClick(chordBox);
   }
 }
 
@@ -304,7 +393,6 @@ function createNewSyllable(syllableText = '-') {
 }
 
 function createNewLineFromText(text) {
-  // Split text by spaces and filter out empty strings
   const syllables = text.trim().split(/\s+/).filter(syllable => syllable.length > 0);
   
   if (syllables.length === 0) {
@@ -312,22 +400,18 @@ function createNewLineFromText(text) {
     return;
   }
 
-  // Create a new notation line
   const newLine = document.createElement('div');
   newLine.className = 'notation-line overflow';
   
-  // Create syllables for each word
   syllables.forEach(syllableText => {
     const syllable = createNewSyllable(syllableText);
     addSyllableEventListeners(syllable);
     newLine.appendChild(syllable);
   });
   
-  // Add the new line to the notation container
   const notationContainer = document.querySelector('.notation-container');
   notationContainer.appendChild(newLine);
   
-  // Activate the first syllable of the new line
   const firstSyllable = newLine.querySelector('.syllable');
   if (firstSyllable) {
     setSyllableAsActive(firstSyllable);
@@ -357,8 +441,6 @@ function addSyllableAfterCurrent() {
   if (targetSyllable) targetSyllable.insertAdjacentElement('afterend', newSyllable);
   else targetLine.appendChild(newSyllable);
   addSyllableEventListeners(newSyllable);
-  const updatedSyllables = getAllSyllables();
-  // currentSyllableIndex will be set by setSyllableAsActive
   setSyllableAsActive(newSyllable); 
 }
 
@@ -369,26 +451,19 @@ function deleteSyllable() {
   if (currentSyllableIndex >= syllables.length) return;
   
   const syllableToDelete = syllables[currentSyllableIndex];
-  const syllableParent = syllableToDelete.parentNode;
-  
-  // Remove the syllable from the DOM
   syllableToDelete.remove();
   
-  // Update currentSyllableIndex after deletion
   const remainingSyllables = getAllSyllables();
   if (remainingSyllables.length === 0) {
     currentSyllableIndex = -1;
     navigationOffEndState = null;
   } else {
-    // If we deleted the last syllable, move to the new last syllable
     if (currentSyllableIndex >= remainingSyllables.length) {
       currentSyllableIndex = remainingSyllables.length - 1;
     }
-    // Highlight the new current syllable
     setSyllableAsActive(remainingSyllables[currentSyllableIndex]);
   }
   
-  // Reset delete confirmation state
   resetDeleteConfirmation();
 }
 
@@ -400,7 +475,7 @@ function addSyllableEventListeners(syllable) {
   if (textElement) textElement.addEventListener('click', (event) => handleTextClick(textElement, event));
 }
 
-// ===== TEXT EDITING FUNCTIONS (Largely unchanged) =====
+// ===== TEXT EDITING FUNCTIONS =====
 function startTextEdit(textElement) {
   if (currentlyEditingText && currentlyEditingText !== textElement) finishTextEdit();
   currentlyEditingText = textElement;
@@ -449,7 +524,7 @@ function cancelTextEdit() {
 function toggleEditMode() {
   editModeCheckbox.checked = !editModeCheckbox.checked;
   editToggleBtn.classList.toggle('active', editModeCheckbox.checked);
-  updateEditOnlyControlsVisibility(); // Update visibility of edit-only controls
+  updateEditOnlyControlsVisibility();
   updateAddButtonState();
   updateDeleteButtonState();
   updateNewLineButtonState();
@@ -457,8 +532,17 @@ function toggleEditMode() {
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
   showNames = !showNames;
+  // Apply show-names class to both the notation container AND the body
   document.querySelector('.notation-container').classList.toggle('show-names', showNames);
+  document.body.classList.toggle('show-names', showNames); // FIXED: Also apply to body
   nameToggle.classList.toggle('active', showNames);
+  updateChordBoxLabels(); // Update chord box labels when glasses toggle changes
+}
+function toggleChords() {
+  chordMode = !chordMode;
+  chordToggle.classList.toggle('active', chordMode);
+  updateChordBoxesVisibility();
+  console.log(`Chord mode ${chordMode ? 'enabled' : 'disabled'}`);
 }
 function toggleInfo() {
   infoVisible = !infoVisible;
@@ -484,8 +568,12 @@ function updateNewLineButtonState() {
 }
 function changeKey(newKey) {
   if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
-    currentKey = newKey; applyNoteColors(); console.log(`Key changed to: ${newKey}`);
-    resetAccidentalToggleVisuals(); // Also reset toggle when key changes
+    currentKey = newKey; 
+    applyNoteColors(); 
+    applyChordColors();
+    updateChordBoxLabels(); // Update chord box labels when key changes
+    console.log(`Key changed to: ${newKey}`);
+    resetAccidentalToggleVisuals();
   } else console.warn(`Attempted to change to invalid key: ${newKey}`);
 }
 
@@ -528,43 +616,38 @@ function changeNote(noteElement, direction = 'up', playSound = true) {
 }
 
 // ===== NAVIGATION FUNCTIONS =====
-
-// Helper to enter the "deselected" state when navigating off ends
-function enterDeselectedState(boundary) { // boundary is 'beforeStart' or 'afterEnd'
+function enterDeselectedState(boundary) {
     const syllables = getAllSyllables();
     syllables.forEach(s => s.classList.remove('highlighted'));
     currentSyllableIndex = -1;
     navigationOffEndState = boundary;
-    resetAccidentalToggleVisuals(); // Ensure toggle is off and internal state is natural
-    resetDeleteConfirmation(); // Reset delete confirmation when deselecting
-    updateDeleteButtonState(); // Update delete button state
+    resetAccidentalToggleVisuals();
+    resetDeleteConfirmation();
+    updateDeleteButtonState();
 }
 
 function setSyllableAsActive(syllable) {
   const syllables = getAllSyllables();
   const newIndex = Array.from(syllables).indexOf(syllable);
 
-  if (newIndex >= 0) { // Ensure a valid syllable was found
+  if (newIndex >= 0) {
     const isNewNoteBeingSelected = newIndex !== currentSyllableIndex;
 
-    // Reset toggle if it's a new note selection OR if we were in an "off-end" state and now selecting a note
     if (isNewNoteBeingSelected || navigationOffEndState !== null) {
       resetAccidentalToggleVisuals();
-      resetDeleteConfirmation(); // Reset delete confirmation when selecting a new note
+      resetDeleteConfirmation();
     }
 
     currentSyllableIndex = newIndex;
-    navigationOffEndState = null; // Selecting a valid note clears any boundary state
+    navigationOffEndState = null;
     
-    // Highlight and play the newly active syllable
-    syllables.forEach(s => s.classList.remove('highlighted')); // Deselect all others
+    syllables.forEach(s => s.classList.remove('highlighted'));
     const currentSyllableElement = syllables[currentSyllableIndex];
     currentSyllableElement.classList.add('highlighted');
     scrollToSyllable(currentSyllableElement);
     const noteElement = currentSyllableElement.querySelector('.note');
     if (noteElement) playNoteWithAccidental(noteElement);
     
-    // Update delete button state
     updateDeleteButtonState();
   }
 }
@@ -573,14 +656,14 @@ function navigateLeft() {
   const syllables = getAllSyllables();
   if (syllables.length === 0) return;
 
-  if (currentSyllableIndex === 0) { // Was on the first note
+  if (currentSyllableIndex === 0) {
     enterDeselectedState('beforeStart');
-  } else if (navigationOffEndState === 'beforeStart') { // currentSyllableIndex is -1 here, coming from off-start
-    setSyllableAsActive(syllables[syllables.length - 1]); // Wrap to last note
-  } else { // Includes initial -1 state (navigationOffEndState === null) or navigating from middle/afterEnd
+  } else if (navigationOffEndState === 'beforeStart') {
+    setSyllableAsActive(syllables[syllables.length - 1]);
+  } else {
     let newIndex;
-    if (currentSyllableIndex === -1) { // Initial state, or came from 'afterEnd' and now going left
-        newIndex = syllables.length - 1; // Go to last note
+    if (currentSyllableIndex === -1) {
+        newIndex = syllables.length - 1;
     } else {
         newIndex = (currentSyllableIndex - 1 + syllables.length) % syllables.length;
     }
@@ -592,14 +675,14 @@ function navigateRight() {
   const syllables = getAllSyllables();
   if (syllables.length === 0) return;
 
-  if (currentSyllableIndex === syllables.length - 1) { // Was on the last note
+  if (currentSyllableIndex === syllables.length - 1) {
     enterDeselectedState('afterEnd');
-  } else if (navigationOffEndState === 'afterEnd') { // currentSyllableIndex is -1 here, coming from off-end
-    setSyllableAsActive(syllables[0]); // Wrap to first note
-  } else { // Includes initial -1 state (navigationOffEndState === null) or navigating from middle/beforeStart
+  } else if (navigationOffEndState === 'afterEnd') {
+    setSyllableAsActive(syllables[0]);
+  } else {
     let newIndex;
-    if (currentSyllableIndex === -1) { // Initial state, or came from 'beforeStart' and now going right
-        newIndex = 0; // Go to first note
+    if (currentSyllableIndex === -1) {
+        newIndex = 0;
     } else {
         newIndex = (currentSyllableIndex + 1) % syllables.length;
     }
@@ -620,15 +703,12 @@ function handleNoteClick(noteElement) {
   const syllable = noteElement.closest('.syllable');
   const syllableIndex = Array.from(getAllSyllables()).indexOf(syllable);
   
-  // First, activate the syllable if it's not already active
   if (syllableIndex !== currentSyllableIndex) {
     setSyllableAsActive(syllable);
-    return; // Exit early - only activate on first click
+    return;
   }
   
-  // If we get here, the syllable is already active, so handle note changing
   if (editModeCheckbox.checked) {
-    // Double click logic for diatonic change (also resets accidental toggle via changeNote)
     if (clickTimer) { 
       clearTimeout(clickTimer); 
       clickTimer = null; 
@@ -654,18 +734,15 @@ function handleDeleteClick() {
   if (!editModeCheckbox.checked || currentSyllableIndex < 0) return;
   
   if (!deleteConfirmationState) {
-    // First click - show confirmation state (red glow)
     deleteConfirmationState = true;
     deleteBtn.classList.add('confirm-delete');
     
-    // Auto-reset after 3 seconds if no second click
     setTimeout(() => {
       if (deleteConfirmationState) {
         resetDeleteConfirmation();
       }
     }, 3000);
   } else {
-    // Second click - actually delete the syllable
     deleteSyllable();
   }
 }
@@ -673,24 +750,35 @@ function handleDeleteClick() {
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   accidentalMode = 'natural'; 
-  currentSyllableIndex = -1; // Start with no note selected
-  navigationOffEndState = null; // Start with no boundary state
-  deleteConfirmationState = false; // Start with no delete confirmation
+  currentSyllableIndex = -1;
+  navigationOffEndState = null;
+  deleteConfirmationState = false;
+  chordMode = false;
+  selectedChord = null;
+  showNames = false; // Initialize showNames
   applyNoteColors(); 
+  applyChordColors();
+  updateChordBoxLabels(); // Initialize chord box labels
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
-  updateEditOnlyControlsVisibility(); // Initialize visibility state
+  updateEditOnlyControlsVisibility();
+  updateChordBoxesVisibility();
   syncEditButtonState(); 
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
   document.querySelectorAll('.syllable').forEach(syllable => addSyllableEventListeners(syllable));
+  
+  document.querySelectorAll('.chord-box').forEach(chordBox => {
+    chordBox.addEventListener('click', () => handleChordBoxClick(chordBox));
+  });
 });
 
-// ===== EVENT LISTENERS (for dynamic elements or global) =====
+// ===== EVENT LISTENERS =====
 infoIcon.addEventListener('click', toggleInfo);
 minimizeBtn.addEventListener('click', toggleMinimize);
 nameToggle.addEventListener('click', toggleNames);
+chordToggle.addEventListener('click', toggleChords);
 leftArrowBtn.addEventListener('click', navigateLeft);
 rightArrowBtn.addEventListener('click', navigateRight);
 addBtn.addEventListener('click', addSyllableAfterCurrent);
@@ -698,18 +786,15 @@ newLineBtn.addEventListener('click', showNewLinePopup);
 deleteBtn.addEventListener('click', handleDeleteClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
 
-// New line popup event listeners
 cancelNewLine.addEventListener('click', hideNewLinePopup);
 submitNewLine.addEventListener('click', handleNewLineSubmit);
 
-// Close popup when clicking outside
 newLinePopup.addEventListener('click', (event) => {
   if (event.target === newLinePopup) {
     hideNewLinePopup();
   }
 });
 
-// Handle escape key in popup
 newLineText.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     hideNewLinePopup();
@@ -718,17 +803,15 @@ newLineText.addEventListener('keydown', (event) => {
 
 editModeCheckbox.addEventListener('change', () => { 
   syncEditButtonState(); 
-  updateEditOnlyControlsVisibility(); // Update visibility when checkbox changes
+  updateEditOnlyControlsVisibility();
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
-  if (!editModeCheckbox.checked) { // If turning edit mode off, reset toggle and boundary state
+  if (!editModeCheckbox.checked) {
     resetAccidentalToggleVisuals();
     resetDeleteConfirmation();
     hideNewLinePopup();
     navigationOffEndState = null; 
-    // Optionally, deselect current note too if desired when exiting edit mode
-    // if (currentSyllableIndex !== -1) enterDeselectedState(null); // This would deselect the note
   }
 });
 
@@ -774,13 +857,20 @@ accidentalToggle.addEventListener('click', (event) => {
 keySelector.addEventListener('change', (event) => changeKey(event.target.value));
 document.addEventListener('click', (event) => {
   if (currentlyEditingText && !event.target.closest('.syllable.editing') && !isAdvancingToNext) finishTextEdit();
-  // Reset delete confirmation if clicking elsewhere
   if (!event.target.closest('#deleteBtn') && deleteConfirmationState) {
     resetDeleteConfirmation();
   }
 });
 document.addEventListener('keydown', (event) => {
   if (currentlyEditingText) return;
+  
+  // Handle number keys 1-9 for chord selection
+  if (event.key >= '1' && event.key <= '9') {
+    event.preventDefault();
+    selectChordByKeyNumber(event.key);
+    return;
+  }
+  
   switch(event.key) {
     case 'ArrowLeft': event.preventDefault(); navigateLeft(); break;
     case 'ArrowRight': event.preventDefault(); navigateRight(); break;
