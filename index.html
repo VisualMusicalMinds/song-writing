@@ -119,18 +119,51 @@
 
     <!-- Bottom Controls -->
     <div class="bottom-controls-group" id="controlsGroup">
-        <button class="minimize-btn" id="minimizeBtn">▼</button>
-        
         <!-- Navigation Arrows with Minimize Button -->
-<div class="floating-navigation">
-    <button class="minimize-btn" id="minimizeBtn">▼</button>
-    <button class="arrow-btn" id="leftArrow">◀</button>
-    <button class="arrow-btn" id="rightArrow">▶</button>
-</div>
+        <div class="floating-navigation">
+            <button class="minimize-btn" id="minimizeBtn">▼</button>
+            <button class="arrow-btn" id="leftArrow">◀</button>
+            <button class="arrow-btn" id="rightArrow">▶</button>
+        </div>
 
         <!-- Control Panel -->
         <div class="bottom-controls">
-            <div class="edit-controls">
+            <!-- Edit-Only Controls Row (Hidden by default) -->
+            <div class="edit-controls edit-only-controls" id="editOnlyControls">
+                <!-- Accidental Toggle Button -->
+                <div class="accidental-toggle" id="accidentalToggle" title="Accidentals: Flat, Sharp">
+                    <div class="accidental-option" data-type="flat">♭</div>
+                    <div class="accidental-option" data-type="sharp">♯</div>
+                </div>
+                
+                <!-- Add Syllable Button -->
+                <div class="control-group">
+                    <button class="add-btn" id="addBtn">+</button>
+                </div>
+
+                <!-- New Line Button -->
+                <div class="control-group">
+                    <button class="new-line-btn" id="newLineBtn" title="Add new line from text">¶</button>
+                </div>
+
+                <!-- Delete Syllable Button -->
+                <div class="control-group">
+                    <button class="delete-btn" id="deleteBtn" title="Delete syllable (click twice)">
+                        <svg class="trash-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Trash can lid -->
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <!-- Trash can body -->
+                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Vertical lines in trash -->
+                            <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Standard Controls Row (Always visible) -->
+            <div class="edit-controls standard-controls">
                 <!-- Key Selector Dropdown -->
                 <div class="control-group">
                     <select class="key-selector" id="keySelector">
@@ -178,37 +211,6 @@
                             <rect x="10.8" y="8.5" width="6.4" height="3" rx="1.5" fill="currentColor"/>
                             <circle cx="6" cy="10" r="1.5" fill="currentColor"/>
                             <circle cx="22" cy="10" r="1.5" fill="currentColor"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Accidental Toggle Button -->
-                <div class="accidental-toggle" id="accidentalToggle" title="Accidentals: Flat, Sharp">
-                    <div class="accidental-option" data-type="flat">♭</div>
-                    <div class="accidental-option" data-type="sharp">♯</div>
-                </div>
-                
-                <!-- Add Syllable Button -->
-                <div class="control-group">
-                    <button class="add-btn" id="addBtn">+</button>
-                </div>
-
-                <!-- New Line Button -->
-                <div class="control-group">
-                    <button class="new-line-btn" id="newLineBtn" title="Add new line from text">¶</button>
-                </div>
-
-                <!-- Delete Syllable Button -->
-                <div class="control-group">
-                    <button class="delete-btn" id="deleteBtn" title="Delete syllable (click twice)">
-                        <svg class="trash-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Trash can lid -->
-                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <!-- Trash can body -->
-                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <!-- Vertical lines in trash -->
-                            <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </button>
                 </div>
