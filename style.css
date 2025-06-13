@@ -227,6 +227,12 @@ body {
   gap: 20px;
   align-items: center; /* Ensure vertical alignment */
   position: relative; /* Allow absolute positioning of minimize button */
+  transition: transform 0.3s ease; /* Add smooth transition for navigation movement */
+}
+
+/* Move navigation arrows down when chord mode is off */
+body:not(.chord-mode-active) .floating-navigation {
+  transform: translateY(30px); /* Move down by 30px when chord mode is off */
 }
 
 /* Position minimize button to the left of navigation arrows */
@@ -240,6 +246,94 @@ body {
   height: 30px;
   pointer-events: none; /* This is just for spacing reference */
 }
+
+/* ===== CHORD BOXES ===== */
+.chord-boxes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  margin-bottom: 0;
+}
+
+.chord-boxes.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  margin-bottom: 10px;
+}
+
+/* Keep chord boxes visible when minimized but chord mode is active */
+.bottom-controls-group.minimized .chord-boxes.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  margin-bottom: 10px;
+}
+
+.chord-box-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chord-box-number {
+  font-size: 10px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+  height: 12px; /* Fixed height to prevent layout shift */
+}
+
+/* FIXED: Show chord box numbers when glasses are active */
+.show-names .chord-box-number {
+  opacity: 1;
+}
+
+.chord-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 40px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.chord-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.1);
+}
+
+.chord-box:active {
+  transform: scale(0.95);
+}
+
+.chord-box.selected {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5),
+              0 4px 15px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.2);
+}
+
 .arrow-btn {
   background-color: #007bff;
   color: white;
@@ -325,6 +419,13 @@ body {
 
 .bottom-controls-group.minimized .minimize-btn:hover {
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Hide only the bottom controls when minimized, not the chord boxes */
+.bottom-controls-group.minimized .chord-boxes:not(.show) {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
 }
 
 /* ===== EDIT CONTROLS LAYOUT ===== */
@@ -530,6 +631,33 @@ body {
   filter: drop-shadow(0 0 4px #ff9500) 
           drop-shadow(0 0 8px #ff9500) 
           drop-shadow(0 0 12px #ff9500);
+}
+
+/* ===== PIANO KEYS ICON (Chord Button) ===== */
+.icon-btn .piano-keys-icon {
+  transition: all 0.3s ease;
+  color: #6c757d; /* Grey when chord mode is off */
+}
+
+/* Chord mode OFF - grey piano keys */
+.icon-btn:not(.active) .piano-keys-icon {
+  color: #6c757d;
+  filter: none;
+}
+
+/* Chord mode ON - purple piano keys with tight glow */
+.icon-btn.active .piano-keys-icon {
+  color: #9f4fff; /* Musical purple */
+  filter: drop-shadow(0 0 3px #9f4fff) 
+          drop-shadow(0 0 6px #9f4fff) 
+          drop-shadow(0 0 9px #9f4fff);
+}
+
+/* Enhanced hover effect when active */
+.icon-btn.active:hover .piano-keys-icon {
+  filter: drop-shadow(0 0 4px #9f4fff) 
+          drop-shadow(0 0 8px #9f4fff) 
+          drop-shadow(0 0 12px #9f4fff);
 }
 
 /* ===== ADD SYLLABLE BUTTON ===== */
@@ -856,6 +984,11 @@ html {
 }
 
 @media (max-width: 768px) {
+  /* Move navigation arrows down more on mobile when chord mode is off */
+  body:not(.chord-mode-active) .floating-navigation {
+    transform: translateY(25px); /* Slightly less movement on mobile */
+  }
+
   .text { font-size: 16px; }
   .text-input { font-size: 16px; }
   .note { width: 28px; }
@@ -874,11 +1007,25 @@ html {
   .new-line-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
   .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
   .icon-btn .glasses-icon { width: 24px; height: 16px; }
+  .icon-btn .piano-keys-icon { width: 24px; height: 18px; }
   .accidental-toggle { font-size: 14px; }
   .accidental-option { min-width: 16px; height: 28px; padding: 3px 5px; }
   .accidental-symbol { font-size: 15px; }
   .key-selector { font-size: 12px; min-width: 40px; height: 28px; padding: 3px 6px; padding-right: 20px; background-size: 10px; }
   .edit-only-controls.show { max-height: 50px; }
+  
+  /* Responsive chord boxes */
+  .chord-boxes { gap: 6px; }
+  .chord-box { 
+    padding: 6px 8px; 
+    font-size: 12px; 
+    min-width: 32px; 
+  }
+  .chord-box-number {
+    font-size: 9px;
+    margin-bottom: 1px;
+    height: 10px;
+  }
   
   .popup-content {
     min-width: 300px;
@@ -896,6 +1043,11 @@ html {
 }
 
 @media (max-width: 480px) {
+  /* Move navigation arrows down more on small mobile when chord mode is off */
+  body:not(.chord-mode-active) .floating-navigation {
+    transform: translateY(20px); /* Even less movement on very small screens */
+  }
+
   .text { font-size: 14px; }
   .text-input { font-size: 14px; }
   .note { width: 24px; }
@@ -915,11 +1067,29 @@ html {
   .new-line-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
   .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
   .icon-btn .glasses-icon { width: 20px; height: 14px; }
+  .icon-btn .piano-keys-icon { width: 20px; height: 16px; }
   .accidental-toggle { font-size: 12px; }
   .accidental-option { min-width: 14px; height: 24px; padding: 2px 4px; }
   .accidental-symbol { font-size: 13px; }
   .key-selector { font-size: 11px; min-width: 35px; height: 24px; padding: 2px 5px; padding-right: 18px; background-size: 8px; }
   .edit-only-controls.show { max-height: 40px; }
+  
+  /* Small screen chord boxes */
+  .chord-boxes { 
+    gap: 4px; 
+    flex-wrap: wrap;
+    max-width: 320px;
+  }
+  .chord-box { 
+    padding: 4px 6px; 
+    font-size: 10px; 
+    min-width: 28px; 
+  }
+  .chord-box-number {
+    font-size: 8px;
+    margin-bottom: 1px;
+    height: 9px;
+  }
   
   .popup-content {
     min-width: 280px;
