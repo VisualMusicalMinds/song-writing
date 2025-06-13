@@ -126,6 +126,46 @@
             <button class="arrow-btn" id="rightArrow">▶</button>
         </div>
 
+        <!-- Chord Boxes (appear above the control panel when chord mode is active) -->
+        <div class="chord-boxes" id="chordBoxes">
+            <div class="chord-box-container">
+                <div class="chord-box-number">1</div>
+                <div class="chord-box" data-chord="I" data-key="1">I</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">2</div>
+                <div class="chord-box" data-chord="ii" data-key="2">ii</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">3</div>
+                <div class="chord-box" data-chord="iii" data-key="3">iii</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">4</div>
+                <div class="chord-box" data-chord="IV" data-key="4">IV</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">5</div>
+                <div class="chord-box" data-chord="V" data-key="5">V</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">6</div>
+                <div class="chord-box" data-chord="vi" data-key="6">vi</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">7</div>
+                <div class="chord-box" data-chord="V/V" data-key="7">V/V</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">8</div>
+                <div class="chord-box" data-chord="V/vi" data-key="8">V/vi</div>
+            </div>
+            <div class="chord-box-container">
+                <div class="chord-box-number">9</div>
+                <div class="chord-box" data-chord="IV/IV" data-key="9">IV/IV</div>
+            </div>
+        </div>
+
         <!-- Control Panel -->
         <div class="bottom-controls">
             <!-- Edit-Only Controls Row (Hidden by default) -->
@@ -180,6 +220,24 @@
                         <option value="Bb">B♭</option>
                         <option value="B">B</option>
                     </select>
+                </div>
+
+                <!-- Chord Toggle Button -->
+                <div class="control-group">
+                    <button class="icon-btn" id="chordToggle" title="Chord mode">
+                        <svg class="piano-keys-icon" width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- White keys -->
+                            <rect x="2" y="4" width="6" height="14" rx="1" fill="white" stroke="currentColor" stroke-width="1"/>
+                            <rect x="8" y="4" width="6" height="14" rx="1" fill="white" stroke="currentColor" stroke-width="1"/>
+                            <rect x="14" y="4" width="6" height="14" rx="1" fill="white" stroke="currentColor" stroke-width="1"/>
+                            <rect x="20" y="4" width="6" height="14" rx="1" fill="white" stroke="currentColor" stroke-width="1"/>
+                            
+                            <!-- Black keys -->
+                            <rect x="5.5" y="4" width="3" height="9" rx="0.5" fill="currentColor"/>
+                            <rect x="11.5" y="4" width="3" height="9" rx="0.5" fill="currentColor"/>
+                            <rect x="17.5" y="4" width="3" height="9" rx="0.5" fill="currentColor"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Edit Mode with Construction Hat -->
