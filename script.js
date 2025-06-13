@@ -83,6 +83,7 @@ const newLinePopup = document.getElementById('newLinePopup');
 const newLineText = document.getElementById('newLineText');
 const cancelNewLine = document.getElementById('cancelNewLine');
 const submitNewLine = document.getElementById('submitNewLine');
+const editOnlyControls = document.getElementById('editOnlyControls');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1; // -1 means nothing is selected
@@ -116,6 +117,15 @@ function resetAccidentalToggleVisuals() {
 function resetDeleteConfirmation() {
     deleteConfirmationState = false;
     deleteBtn.classList.remove('confirm-delete');
+}
+
+// ===== EDIT MODE VISIBILITY FUNCTIONS =====
+function updateEditOnlyControlsVisibility() {
+  if (editModeCheckbox.checked) {
+    editOnlyControls.classList.add('show');
+  } else {
+    editOnlyControls.classList.remove('show');
+  }
 }
 
 // ===== FREQUENCY CALCULATION FUNCTIONS =====
@@ -439,6 +449,7 @@ function cancelTextEdit() {
 function toggleEditMode() {
   editModeCheckbox.checked = !editModeCheckbox.checked;
   editToggleBtn.classList.toggle('active', editModeCheckbox.checked);
+  updateEditOnlyControlsVisibility(); // Update visibility of edit-only controls
   updateAddButtonState();
   updateDeleteButtonState();
   updateNewLineButtonState();
@@ -596,7 +607,6 @@ function navigateRight() {
   }
 }
 
-
 function editCurrentNote(direction) { 
   const syllables = getAllSyllables();
   if (currentSyllableIndex >= 0 && currentSyllableIndex < syllables.length && editModeCheckbox.checked) {
@@ -670,6 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
+  updateEditOnlyControlsVisibility(); // Initialize visibility state
   syncEditButtonState(); 
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
@@ -707,6 +718,7 @@ newLineText.addEventListener('keydown', (event) => {
 
 editModeCheckbox.addEventListener('change', () => { 
   syncEditButtonState(); 
+  updateEditOnlyControlsVisibility(); // Update visibility when checkbox changes
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
