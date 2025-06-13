@@ -292,9 +292,9 @@ body {
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 50%; /* Make it circular like the arrow buttons */
-  width: 30px; /* Slightly smaller than arrow buttons */
-  height: 30px;
+  border-radius: 8px; /* Changed from 50% to 8px for rounded rectangle */
+  width: 40px; /* Made wider for rectangle shape */
+  height: 30px; /* Keep height the same */
   font-size: 12px;
   cursor: pointer;
   display: flex;
@@ -327,6 +327,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
 }
 
+/* ===== EDIT CONTROLS LAYOUT ===== */
 .edit-controls {
   display: flex;
   align-items: center;
@@ -334,6 +335,26 @@ body {
   gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+/* Edit-only controls (hidden by default, shown when edit mode is on) */
+.edit-only-controls {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  margin-bottom: 0;
+}
+
+.edit-only-controls.show {
+  max-height: 60px; /* Adjust based on your button heights */
+  opacity: 1;
+  margin-bottom: 10px;
+}
+
+/* Standard controls (always visible) */
+.standard-controls {
+  /* No special styling needed - always visible */
 }
 
 .control-group {
@@ -655,89 +676,6 @@ body {
   box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
-/* ===== HINTS ===== */
-.hints {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.hints.show {
-  max-height: 100px;
-  opacity: 1;
-  padding: 8px 16px;
-  background-color: rgba(240, 248, 255, 0.9);
-  border-radius: 8px;
-  margin-top: 5px;
-}
-
-.edit-hint, .keyboard-hint {
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-  font-style: italic;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-html {
-  scroll-behavior: smooth;
-}
-
-@media (max-width: 768px) {
-  .text { font-size: 16px; }
-  .text-input { font-size: 16px; }
-  .note { width: 28px; }
-  .syllable { min-width: 36px; scroll-margin: 80px; }
-  .arrow-btn { width: 45px; height: 45px; font-size: 18px; }
-  .floating-navigation { gap: 15px; }
-  .bottom-controls { padding: 12px 15px; min-width: 180px; }
-  .bottom-controls-group { gap: 12px; }
-  .info-icon { width: 16px; height: 16px; font-size: 11px; }
-  .minimize-btn { width: 18px; height: 14px; font-size: 9px; top: 6px; left: 10px; }
-  .bottom-controls-group.minimized .minimize-btn { top: -30px; left: 10px; }
-  .letter-name { font-size: 24px; top: -24px; }
-  .solfege-name { font-size: 14px; }
-  .add-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
-  .delete-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
-  .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
-  .icon-btn .glasses-icon { width: 24px; height: 16px; }
-  .accidental-toggle { font-size: 14px; }
-  .accidental-option { min-width: 16px; height: 28px; padding: 3px 5px; }
-  .accidental-symbol { font-size: 15px; } /* Proportionally scaled for mobile */
-  .key-selector { font-size: 12px; min-width: 40px; height: 28px; padding: 3px 6px; padding-right: 20px; background-size: 10px; }
-}
-
-@media (max-width: 480px) {
-  .text { font-size: 14px; }
-  .text-input { font-size: 14px; }
-  .note { width: 24px; }
-  .syllable { min-width: 32px; scroll-margin: 60px; }
-  .arrow-btn { width: 40px; height: 40px; font-size: 16px; }
-  .floating-navigation { gap: 12px; }
-  .bottom-controls { padding: 10px 12px; min-width: 160px; }
-  .bottom-controls-group { gap: 10px; }
-  .edit-controls { font-size: 14px; }
-  .info-icon { width: 15px; height: 15px; font-size: 10px; }
-  .minimize-btn { width: 16px; height: 12px; font-size: 8px; top: 5px; left: 8px; }
-  .bottom-controls-group.minimized .minimize-btn { top: -25px; left: 8px; }
-  .letter-name { font-size: 20px; top: -20px; }
-  .solfege-name { font-size: 12px; }
-  .add-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
-  .delete-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
-  .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
-  .icon-btn .glasses-icon { width: 20px; height: 14px; }
-  .accidental-toggle { font-size: 12px; }
-  .accidental-option { min-width: 14px; height: 24px; padding: 2px 4px; }
-  .accidental-symbol { font-size: 13px; } /* Proportionally scaled for small mobile */
-  .key-selector { font-size: 11px; min-width: 35px; height: 24px; padding: 2px 5px; padding-right: 18px; background-size: 8px; }
-}
-/* Add these new styles to your CSS file */
-
 /* ===== NEW LINE BUTTON ===== */
 .new-line-btn {
   background-color: #6c757d;
@@ -777,6 +715,34 @@ html {
 .new-line-btn:disabled:hover {
   filter: none;
   transform: none;
+}
+
+/* ===== HINTS ===== */
+.hints {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.hints.show {
+  max-height: 100px;
+  opacity: 1;
+  padding: 8px 16px;
+  background-color: rgba(240, 248, 255, 0.9);
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.edit-hint, .keyboard-hint {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  font-style: italic;
 }
 
 /* ===== NEW LINE POPUP ===== */
@@ -884,14 +850,35 @@ html {
   transform: scale(0.98);
 }
 
-/* ===== RESPONSIVE UPDATES ===== */
+/* ===== RESPONSIVE DESIGN ===== */
+html {
+  scroll-behavior: smooth;
+}
+
 @media (max-width: 768px) {
-  .new-line-btn { 
-    font-size: 16px; 
-    min-width: 28px; 
-    height: 28px; 
-    padding: 3px 6px; 
-  }
+  .text { font-size: 16px; }
+  .text-input { font-size: 16px; }
+  .note { width: 28px; }
+  .syllable { min-width: 36px; scroll-margin: 80px; }
+  .arrow-btn { width: 45px; height: 45px; font-size: 18px; }
+  .floating-navigation { gap: 15px; }
+  .bottom-controls { padding: 12px 15px; min-width: 180px; }
+  .bottom-controls-group { gap: 12px; }
+  .info-icon { width: 16px; height: 16px; font-size: 11px; }
+  .minimize-btn { width: 35px; height: 25px; font-size: 9px; }
+  .bottom-controls-group.minimized .minimize-btn { background-color: #007bff; }
+  .letter-name { font-size: 24px; top: -24px; }
+  .solfege-name { font-size: 14px; }
+  .add-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
+  .delete-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
+  .new-line-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
+  .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
+  .icon-btn .glasses-icon { width: 24px; height: 16px; }
+  .accidental-toggle { font-size: 14px; }
+  .accidental-option { min-width: 16px; height: 28px; padding: 3px 5px; }
+  .accidental-symbol { font-size: 15px; }
+  .key-selector { font-size: 12px; min-width: 40px; height: 28px; padding: 3px 6px; padding-right: 20px; background-size: 10px; }
+  .edit-only-controls.show { max-height: 50px; }
   
   .popup-content {
     min-width: 300px;
@@ -909,12 +896,30 @@ html {
 }
 
 @media (max-width: 480px) {
-  .new-line-btn { 
-    font-size: 14px; 
-    min-width: 24px; 
-    height: 24px; 
-    padding: 2px 5px; 
-  }
+  .text { font-size: 14px; }
+  .text-input { font-size: 14px; }
+  .note { width: 24px; }
+  .syllable { min-width: 32px; scroll-margin: 60px; }
+  .arrow-btn { width: 40px; height: 40px; font-size: 16px; }
+  .floating-navigation { gap: 12px; }
+  .bottom-controls { padding: 10px 12px; min-width: 160px; }
+  .bottom-controls-group { gap: 10px; }
+  .edit-controls { font-size: 14px; }
+  .info-icon { width: 15px; height: 15px; font-size: 10px; }
+  .minimize-btn { width: 30px; height: 22px; font-size: 8px; }
+  .bottom-controls-group.minimized .minimize-btn { background-color: #007bff; }
+  .letter-name { font-size: 20px; top: -20px; }
+  .solfege-name { font-size: 12px; }
+  .add-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
+  .delete-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
+  .new-line-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
+  .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
+  .icon-btn .glasses-icon { width: 20px; height: 14px; }
+  .accidental-toggle { font-size: 12px; }
+  .accidental-option { min-width: 14px; height: 24px; padding: 2px 4px; }
+  .accidental-symbol { font-size: 13px; }
+  .key-selector { font-size: 11px; min-width: 35px; height: 24px; padding: 2px 5px; padding-right: 18px; background-size: 8px; }
+  .edit-only-controls.show { max-height: 40px; }
   
   .popup-content {
     min-width: 280px;
@@ -927,32 +932,5 @@ html {
   
   .popup-btn {
     width: 100%;
-  }
-}
-@media (max-width: 768px) {
-  .minimize-btn { 
-    width: 25px; 
-    height: 25px; 
-    font-size: 10px; 
-  }
-  
-  .floating-navigation::before {
-    left: -40px;
-    width: 25px;
-    height: 25px;
-  }
-}
-
-@media (max-width: 480px) {
-  .minimize-btn { 
-    width: 22px; 
-    height: 22px; 
-    font-size: 9px; 
-  }
-  
-  .floating-navigation::before {
-    left: -35px;
-    width: 22px;
-    height: 22px;
   }
 }
