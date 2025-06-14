@@ -54,6 +54,92 @@ const chordNamesByKey = {
   'B': { 'I': 'B', 'ii': 'C#m', 'iii': 'D#m', 'IV': 'E', 'V': 'F#', 'vi': 'G#m', 'V/V': 'C#', 'V/vi': 'D#', 'IV/IV': 'A' }
 };
 
+// ===== CHORD FREQUENCY DEFINITIONS =====
+const NOTE_FREQUENCIES = {
+  'C2': 65.41, 'C#2': 69.30, 'Db2': 69.30, 'D2': 73.42, 'D#2': 77.78, 'Eb2': 77.78,
+  'E2': 82.41, 'F2': 87.31, 'F#2': 92.50, 'Gb2': 92.50, 'G2': 98.00, 'G#2': 103.83,
+  'Ab2': 103.83, 'A2': 110.00, 'A#2': 116.54, 'Bb2': 116.54, 'B2': 123.47,
+  'C3': 130.81, 'C#3': 138.59, 'Db3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'Eb3': 155.56,
+  'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'Gb3': 185.00, 'G3': 196.00, 'G#3': 207.65,
+  'Ab3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'Bb3': 233.08, 'B3': 246.94,
+  'C4': 261.63, 'C#4': 277.18, 'Db4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'Eb4': 311.13,
+  'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'Gb4': 369.99, 'G4': 392.00, 'G#4': 415.30,
+  'Ab4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'Bb4': 466.16, 'B4': 493.88,
+  'C5': 523.25, 'C#5': 554.37, 'Db5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'Eb5': 622.25,
+  'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'Gb5': 739.99, 'G5': 783.99, 'G#5': 830.61,
+  'Ab5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'Bb5': 932.33, 'B5': 987.77,
+  'C6': 1046.50, 'C#6': 1108.73, 'Db6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'Eb6': 1244.51,
+  'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'Gb6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22,
+  'Ab6': 1661.22, 'A6': 1760.00, 'A#6': 1864.66, 'Bb6': 1864.66, 'B6': 1975.53
+};
+
+// ===== CHORD TRANSPOSITION SYSTEM =====
+const BASE_CHORD_VOICINGS = {
+  'I': ['C3', 'C4', 'E4', 'G4'],
+  'ii': ['D3', 'D4', 'F4', 'A4'],
+  'iii': ['E3', 'E4', 'G4', 'B4'],
+  'IV': ['F3', 'F4', 'A4', 'C5'],
+  'V': ['G3', 'D4', 'G4', 'B4'],
+  'vi': ['A3', 'E4', 'A4', 'C5'],
+  'V/V': ['D3', 'D4', 'F#4', 'A4'],
+  'V/vi': ['E3', 'E4', 'G#4', 'B4'],
+  'IV/IV': ['Bb3', 'D4', 'F4', 'Bb4']
+};
+
+const CHROMATIC_NOTES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+const KEY_TRANSPOSITION = {
+  'C': { semitones: 0, octaveShift: 0 },
+  'Db': { semitones: 1, octaveShift: 0 },
+  'D': { semitones: 2, octaveShift: 0 },
+  'Eb': { semitones: 3, octaveShift: 0 },
+  'E': { semitones: 4, octaveShift: 0 },
+  'F': { semitones: 5, octaveShift: 0 },
+  'Gb': { semitones: 6, octaveShift: 0 },
+  'G': { semitones: 7, octaveShift: 0 },
+  'Ab': { semitones: 8, octaveShift: -1 },
+  'A': { semitones: 9, octaveShift: -1 },
+  'Bb': { semitones: 10, octaveShift: -1 },
+  'B': { semitones: 11, octaveShift: -1 }
+};
+
+function transposeNote(noteWithOctave, semitonesUp, octaveShift = 0) {
+  const noteMatch = noteWithOctave.match(/^([A-G][b#]?)(\d+)$/);
+  if (!noteMatch) return null;
+  
+  const noteName = noteMatch[1];
+  const octave = parseInt(noteMatch[2]);
+  
+  let noteIndex = CHROMATIC_NOTES.indexOf(noteName);
+  if (noteIndex === -1) {
+    const enharmonics = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb' };
+    noteIndex = CHROMATIC_NOTES.indexOf(enharmonics[noteName]);
+  }
+  if (noteIndex === -1) return null;
+  
+  let newNoteIndex = (noteIndex + semitonesUp) % 12;
+  if (newNoteIndex < 0) newNoteIndex += 12;
+  
+  let newOctave = octave + Math.floor((noteIndex + semitonesUp) / 12) + octaveShift;
+  
+  const newNoteName = CHROMATIC_NOTES[newNoteIndex];
+  return `${newNoteName}${newOctave}`;
+}
+
+function generateChordForKey(key, chordSymbol) {
+  const transposition = KEY_TRANSPOSITION[key];
+  if (!transposition) return null;
+  
+  const baseVoicing = BASE_CHORD_VOICINGS[chordSymbol];
+  if (!baseVoicing) return null;
+  
+  const transposedVoicing = baseVoicing.map(note => 
+    transposeNote(note, transposition.semitones, transposition.octaveShift)
+  ).filter(note => note !== null);
+  
+  return transposedVoicing;
+}
+
 // ===== MUSICAL DATA & CONSTANTS =====
 let currentKey = 'C';
 let showNames = false;
@@ -122,7 +208,6 @@ let currentEditingIndex = -1;
 let isAdvancingToNext = false;
 let deleteConfirmationState = false;
 const DOUBLE_CLICK_DELAY = 300;
-
 // ===== UTILITY FUNCTIONS =====
 function getAllSyllables() {
   return document.querySelectorAll('.syllable');
@@ -130,7 +215,16 @@ function getAllSyllables() {
 
 function scrollToSyllable(syllable) {
   if (!syllable) return;
-  syllable.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  
+  const rect = syllable.getBoundingClientRect();
+  const currentScrollY = window.pageYOffset;
+  const syllableTop = rect.top + currentScrollY;
+  const topOffset = 60;
+  
+  window.scrollTo({
+    top: syllableTop - topOffset,
+    behavior: 'smooth'
+  });
 }
 
 function resetAccidentalToggleVisuals() {
@@ -143,6 +237,10 @@ function resetAccidentalToggleVisuals() {
 function resetDeleteConfirmation() {
     deleteConfirmationState = false;
     deleteBtn.classList.remove('confirm-delete');
+}
+
+function isPopupOpen() {
+  return newLinePopup.classList.contains('show');
 }
 
 // ===== EDIT MODE VISIBILITY FUNCTIONS =====
@@ -205,16 +303,58 @@ function handleChordBoxClick(chordBox) {
   chordBox.classList.add('selected');
   selectedChord = chordName;
   
+  playChord(chordName);
+  
   console.log(`Selected chord: ${chordName}`);
 }
 
 function selectChordByKeyNumber(keyNumber) {
-  if (!chordMode) return; // Only work if chord mode is active
+  if (!chordMode) return;
   
   const chordBox = document.querySelector(`[data-key="${keyNumber}"]`);
   if (chordBox) {
     handleChordBoxClick(chordBox);
   }
+}
+
+function playChord(chordSymbol) {
+  const noteNames = generateChordForKey(currentKey, chordSymbol);
+  if (!noteNames || noteNames.length === 0) {
+    console.warn(`Chord ${chordSymbol} not found for key ${currentKey}`);
+    return;
+  }
+  
+  const frequencies = noteNames.map(noteName => NOTE_FREQUENCIES[noteName]).filter(freq => freq);
+  
+  if (frequencies.length === 0) {
+    console.warn(`No valid frequencies found for chord ${chordSymbol} in key ${currentKey}`);
+    console.log('Note names:', noteNames);
+    return;
+  }
+  
+  console.log(`Playing chord ${chordSymbol} in key ${currentKey}:`, noteNames, 'frequencies:', frequencies);
+  
+  const now = audioCtx.currentTime;
+  const chordDuration = 1.5;
+  
+  frequencies.forEach(frequency => {
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(frequency, now);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(0.15, now + 0.02);
+    gainNode.gain.linearRampToValueAtTime(0.1, now + 0.1);
+    gainNode.gain.linearRampToValueAtTime(0, now + chordDuration);
+    
+    oscillator.start(now);
+    oscillator.stop(now + chordDuration);
+  });
 }
 
 // ===== FREQUENCY CALCULATION FUNCTIONS =====
@@ -442,6 +582,7 @@ function addSyllableAfterCurrent() {
   else targetLine.appendChild(newSyllable);
   addSyllableEventListeners(newSyllable);
   setSyllableAsActive(newSyllable); 
+  return newSyllable;
 }
 
 function deleteSyllable() {
@@ -494,6 +635,7 @@ function startTextEdit(textElement) {
   });
   input.addEventListener('click', (e) => e.stopPropagation());
 }
+
 function finishTextEdit() {
   if (!currentlyEditingText) return;
   const syllable = currentlyEditingText.closest('.syllable');
@@ -501,18 +643,94 @@ function finishTextEdit() {
   if (input) { currentlyEditingText.textContent = input.value || 'text'; input.remove(); currentlyEditingText.style.display = 'flex'; }
   syllable.classList.remove('editing'); currentlyEditingText = null; currentEditingIndex = -1; isAdvancingToNext = false;
 }
+
 function finishTextEditAndAdvance() {
   if (!currentlyEditingText) return;
-  const syllables = getAllSyllables(); const nextIndex = currentEditingIndex + 1; isAdvancingToNext = true;
-  const syllable = currentlyEditingText.closest('.syllable'); const input = syllable.querySelector('.text-input');
-  if (input) { currentlyEditingText.textContent = input.value || 'text'; input.remove(); currentlyEditingText.style.display = 'flex'; }
-  syllable.classList.remove('editing'); currentlyEditingText = null; currentEditingIndex = -1;
+  
+  const syllables = getAllSyllables(); 
+  const currentSyllable = syllables[currentEditingIndex];
+  const currentLine = currentSyllable.closest('.notation-line');
+  const syllablesInCurrentLine = currentLine.querySelectorAll('.syllable');
+  const indexInLine = Array.from(syllablesInCurrentLine).indexOf(currentSyllable);
+  const nextIndex = currentEditingIndex + 1; 
+  isAdvancingToNext = true;
+  
+  const syllable = currentlyEditingText.closest('.syllable'); 
+  const input = syllable.querySelector('.text-input');
+  if (input) { 
+    currentlyEditingText.textContent = input.value || 'text'; 
+    input.remove(); 
+    currentlyEditingText.style.display = 'flex'; 
+  }
+  syllable.classList.remove('editing'); 
+  currentlyEditingText = null; 
+  currentEditingIndex = -1;
+  
   if (nextIndex < syllables.length) {
-    const nextSyllable = syllables[nextIndex]; const nextTextElement = nextSyllable.querySelector('.text');
-    if (nextTextElement) { scrollToSyllable(nextSyllable); setTimeout(() => { isAdvancingToNext = false; startTextEdit(nextTextElement); }, 50); }
-    else isAdvancingToNext = false;
-  } else isAdvancingToNext = false;
+    const nextSyllable = syllables[nextIndex];
+    const nextLine = nextSyllable.closest('.notation-line');
+    
+    if (nextLine === currentLine) {
+      const nextTextElement = nextSyllable.querySelector('.text');
+      if (nextTextElement) { 
+        scrollToSyllable(nextSyllable); 
+        setTimeout(() => { 
+          isAdvancingToNext = false; 
+          startTextEdit(nextTextElement); 
+        }, 50); 
+      } else {
+        isAdvancingToNext = false;
+      }
+    } else {
+      if (editModeCheckbox.checked) {
+        setSyllableAsActive(currentSyllable);
+        
+        const newSyllable = addSyllableAfterCurrent();
+        
+        if (newSyllable) {
+          const newTextElement = newSyllable.querySelector('.text');
+          if (newTextElement) {
+            scrollToSyllable(newSyllable);
+            setTimeout(() => {
+              isAdvancingToNext = false;
+              startTextEdit(newTextElement);
+            }, 50);
+          } else {
+            isAdvancingToNext = false;
+          }
+        } else {
+          isAdvancingToNext = false;
+        }
+      } else {
+        isAdvancingToNext = false;
+      }
+    }
+  } else {
+    if (editModeCheckbox.checked) {
+      setSyllableAsActive(currentSyllable);
+      
+      const newSyllable = addSyllableAfterCurrent();
+      
+      if (newSyllable) {
+        const newTextElement = newSyllable.querySelector('.text');
+        if (newTextElement) {
+          scrollToSyllable(newSyllable);
+          setTimeout(() => {
+            isAdvancingToNext = false;
+            startTextEdit(newTextElement);
+          }, 50);
+        } else {
+          isAdvancingToNext = false;
+        }
+      } else {
+        isAdvancingToNext = false;
+      }
+    } else {
+      isAdvancingToNext = false;
+    }
+  }
 }
+
 function cancelTextEdit() {
   if (!currentlyEditingText) return;
   const syllable = currentlyEditingText.closest('.syllable'); const input = syllable.querySelector('.text-input');
@@ -532,11 +750,10 @@ function toggleEditMode() {
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
   showNames = !showNames;
-  // Apply show-names class to both the notation container AND the body
   document.querySelector('.notation-container').classList.toggle('show-names', showNames);
-  document.body.classList.toggle('show-names', showNames); // FIXED: Also apply to body
+  document.body.classList.toggle('show-names', showNames);
   nameToggle.classList.toggle('active', showNames);
-  updateChordBoxLabels(); // Update chord box labels when glasses toggle changes
+  updateChordBoxLabels();
 }
 function toggleChords() {
   chordMode = !chordMode;
@@ -571,7 +788,7 @@ function changeKey(newKey) {
     currentKey = newKey; 
     applyNoteColors(); 
     applyChordColors();
-    updateChordBoxLabels(); // Update chord box labels when key changes
+    updateChordBoxLabels();
     console.log(`Key changed to: ${newKey}`);
     resetAccidentalToggleVisuals();
   } else console.warn(`Attempted to change to invalid key: ${newKey}`);
@@ -755,10 +972,10 @@ document.addEventListener('DOMContentLoaded', () => {
   deleteConfirmationState = false;
   chordMode = false;
   selectedChord = null;
-  showNames = false; // Initialize showNames
+  showNames = false;
   applyNoteColors(); 
   applyChordColors();
-  updateChordBoxLabels(); // Initialize chord box labels
+  updateChordBoxLabels();
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
@@ -861,10 +1078,10 @@ document.addEventListener('click', (event) => {
     resetDeleteConfirmation();
   }
 });
+
 document.addEventListener('keydown', (event) => {
-  if (currentlyEditingText) return;
+  if (isPopupOpen() || currentlyEditingText) return;
   
-  // Handle number keys 1-9 for chord selection
   if (event.key >= '1' && event.key <= '9') {
     event.preventDefault();
     selectChordByKeyNumber(event.key);
