@@ -103,6 +103,23 @@ const KEY_TRANSPOSITION = {
   'B': { semitones: 11, octaveShift: -1 }
 };
 
+// ===== SOLFEGE KEYBOARD MAPPING =====
+const solfegeKeyMap = {
+  'z': 'so-low',     // So-1
+  'x': 'la-low',     // La-1  
+  'c': 'ti-low',     // Ti-1
+  'a': 'do',         // Do1
+  's': 're',         // Re1
+  'd': 'mi',         // Mi1
+  'f': 'fa',         // Fa1
+  'q': 'so',         // So1
+  'w': 'la',         // La1
+  'e': 'ti',         // Ti1
+  'r': 'do-high',    // Do2
+  't': 're-high',    // Re2
+  'y': 'mi-high'     // Mi2
+};
+
 function transposeNote(noteWithOctave, semitonesUp, octaveShift = 0) {
   const noteMatch = noteWithOctave.match(/^([A-G][b#]?)(\d+)$/);
   if (!noteMatch) return null;
@@ -241,6 +258,44 @@ function resetDeleteConfirmation() {
 
 function isPopupOpen() {
   return newLinePopup.classList.contains('show');
+}
+
+// ===== SOLFEGE INPUT FUNCTIONS =====
+function handleSolfegeKeyInput(key) {
+  if (!editModeCheckbox.checked || currentSyllableIndex < 0) return false;
+  
+  const noteClass = solfegeKeyMap[key.toLowerCase()];
+  if (!noteClass) return false;
+  
+  const syllables = getAllSyllables();
+  if (currentSyllableIndex >= syllables.length) return false;
+  
+  const currentSyllable = syllables[currentSyllableIndex];
+  const noteElement = currentSyllable.querySelector('.note');
+  
+  if (noteElement) {
+    // Remove current note class
+    const currentNoteClass = Array.from(noteElement.classList).find(c => noteOrder.includes(c));
+    if (currentNoteClass) {
+      noteElement.classList.remove(currentNoteClass);
+    }
+    
+    // Add new note class
+    noteElement.classList.add(noteClass);
+    
+    // Remove any accidentals and reset accidental mode
+    removeAccidentalFromNote(noteElement);
+    resetAccidentalToggleVisuals();
+    
+    // Update display and play sound
+    updateNoteDisplay(noteElement, noteClass);
+    const frequency = getFrequencyForNote(noteClass);
+    if (frequency !== null) playNote(frequency);
+    
+    return true;
+  }
+  
+  return false;
 }
 
 // ===== EDIT MODE VISIBILITY FUNCTIONS =====
@@ -632,6 +687,10 @@ function startTextEdit(textElement) {
     if (e.key === 'Enter') finishTextEdit();
     else if (e.key === 'Escape') cancelTextEdit();
     else if (e.key === ' ' && e.target.selectionStart === e.target.value.length) { e.preventDefault(); finishTextEditAndAdvance(); }
+    else if ((e.key === 'Backspace' || e.key === 'Delete') && e.target.selectionStart === 0 && e.target.selectionEnd === 0) {
+      e.preventDefault(); 
+      finishTextEditAndGoBack();
+    }
   });
   input.addEventListener('click', (e) => e.stopPropagation());
 }
@@ -640,8 +699,17 @@ function finishTextEdit() {
   if (!currentlyEditingText) return;
   const syllable = currentlyEditingText.closest('.syllable');
   const input = syllable.querySelector('.text-input');
-  if (input) { currentlyEditingText.textContent = input.value || 'text'; input.remove(); currentlyEditingText.style.display = 'flex'; }
-  syllable.classList.remove('editing'); currentlyEditingText = null; currentEditingIndex = -1; isAdvancingToNext = false;
+  if (input) { 
+    // Use dash as default if input is empty
+    const inputValue = input.value.trim();
+    currentlyEditingText.textContent = inputValue || '-'; 
+    input.remove(); 
+    currentlyEditingText.style.display = 'flex'; 
+  }
+  syllable.classList.remove('editing'); 
+  currentlyEditingText = null; 
+  currentEditingIndex = -1; 
+  isAdvancingToNext = false;
 }
 
 function finishTextEditAndAdvance() {
@@ -658,7 +726,9 @@ function finishTextEditAndAdvance() {
   const syllable = currentlyEditingText.closest('.syllable'); 
   const input = syllable.querySelector('.text-input');
   if (input) { 
-    currentlyEditingText.textContent = input.value || 'text'; 
+    // Use dash as default if input is empty
+    const inputValue = input.value.trim();
+    currentlyEditingText.textContent = inputValue || '-'; 
     input.remove(); 
     currentlyEditingText.style.display = 'flex'; 
   }
@@ -728,6 +798,65 @@ function finishTextEditAndAdvance() {
     } else {
       isAdvancingToNext = false;
     }
+  }
+}
+
+function finishTextEditAndGoBack() {
+  if (!currentlyEditingText) return;
+  
+  const syllables = getAllSyllables();
+  const previousIndex = currentEditingIndex - 1;
+  isAdvancingToNext = true;
+  
+  const syllable = currentlyEditingText.closest('.syllable');
+  const input = syllable.querySelector('.text-input');
+  
+  // Check if we're deleting a dash (which triggers syllable deletion)
+  if (input && input.value.trim() === '-') {
+    // User is trying to delete a dash - delete the syllable instead
+    syllable.classList.remove('editing');
+    currentlyEditingText = null;
+    currentEditingIndex = -1;
+    isAdvancingToNext = false;
+    
+    // Set this syllable as active and delete it
+    setSyllableAsActive(syllable);
+    deleteSyllable();
+    return;
+  }
+  
+  if (input) {
+    // Use dash as default if input is empty
+    const inputValue = input.value.trim();
+    currentlyEditingText.textContent = inputValue || '-';
+    input.remove();
+    currentlyEditingText.style.display = 'flex';
+  }
+  syllable.classList.remove('editing');
+  currentlyEditingText = null;
+  currentEditingIndex = -1;
+  
+  if (previousIndex >= 0 && previousIndex < syllables.length) {
+    const previousSyllable = syllables[previousIndex];
+    const previousTextElement = previousSyllable.querySelector('.text');
+    
+    if (previousTextElement) {
+      scrollToSyllable(previousSyllable);
+      setTimeout(() => {
+        isAdvancingToNext = false;
+        startTextEdit(previousTextElement);
+        
+        // Select all text in the previous input for easy replacement
+        const newInput = previousSyllable.querySelector('.text-input');
+        if (newInput) {
+          newInput.select();
+        }
+      }, 50);
+    } else {
+      isAdvancingToNext = false;
+    }
+  } else {
+    isAdvancingToNext = false;
   }
 }
 
@@ -1082,17 +1211,37 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if (isPopupOpen() || currentlyEditingText) return;
   
+  // Handle number keys for chord selection
   if (event.key >= '1' && event.key <= '9') {
     event.preventDefault();
     selectChordByKeyNumber(event.key);
     return;
   }
   
+  // Handle solfege keyboard input (only in edit mode)
+  if (editModeCheckbox.checked && handleSolfegeKeyInput(event.key)) {
+    event.preventDefault();
+    return;
+  }
+  
+  // Handle arrow keys and other navigation
   switch(event.key) {
-    case 'ArrowLeft': event.preventDefault(); navigateLeft(); break;
-    case 'ArrowRight': event.preventDefault(); navigateRight(); break;
-    case 'ArrowUp': event.preventDefault(); editCurrentNote('up'); break;
-    case 'ArrowDown': event.preventDefault(); editCurrentNote('down'); break;
+    case 'ArrowLeft': 
+      event.preventDefault(); 
+      navigateLeft(); 
+      break;
+    case 'ArrowRight': 
+      event.preventDefault(); 
+      navigateRight(); 
+      break;
+    case 'ArrowUp': 
+      event.preventDefault(); 
+      editCurrentNote('up'); 
+      break;
+    case 'ArrowDown': 
+      event.preventDefault(); 
+      editCurrentNote('down'); 
+      break;
     case 'Delete':
     case 'Backspace':
       if (editModeCheckbox.checked && currentSyllableIndex >= 0) {
