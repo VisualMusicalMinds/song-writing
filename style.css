@@ -485,7 +485,7 @@ body:not(.chord-mode-active) .floating-navigation {
   min-width: 45px;
   height: 32px;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 6px center;
   background-size: 12px;
@@ -940,9 +940,15 @@ body:not(.chord-mode-active) .floating-navigation {
 
 .popup-buttons {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 20px;
+}
+
+.popup-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .popup-btn {
@@ -978,6 +984,52 @@ body:not(.chord-mode-active) .floating-navigation {
   transform: scale(0.98);
 }
 
+.popup-mode-toggle {
+  display: flex;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.popup-mode-btn {
+  padding: 10px 16px;
+  border: none;
+  background-color: transparent;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.popup-mode-btn:first-child {
+  border-right: 1px solid #dee2e6;
+}
+
+.popup-mode-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.popup-mode-btn:not(.active):hover {
+  background-color: #e9ecef;
+}
+
+.copy-icon {
+    color: #007bff;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease, stroke-width 0.2s ease;
+}
+
+.copy-icon:hover {
+    transform: scale(1.1);
+}
+
+.copy-icon.copied {
+    color: #28a745;
+    stroke-width: 2.5;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 html {
   scroll-behavior: smooth;
@@ -998,109 +1050,27 @@ html {
   .bottom-controls { padding: 12px 15px; min-width: 180px; }
   .bottom-controls-group { gap: 12px; }
   .info-icon { width: 16px; height: 16px; font-size: 11px; }
-  .minimize-btn { width: 35px; height: 25px; font-size: 9px; }
-  .bottom-controls-group.minimized .minimize-btn { background-color: #007bff; }
-  .letter-name { font-size: 24px; top: -24px; }
-  .solfege-name { font-size: 14px; }
-  .add-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
-  .delete-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
-  .new-line-btn { font-size: 16px; min-width: 28px; height: 28px; padding: 3px 6px; }
-  .icon-btn { min-width: 28px; height: 28px; padding: 3px 5px; }
-  .icon-btn .glasses-icon { width: 24px; height: 16px; }
-  .icon-btn .piano-keys-icon { width: 24px; height: 18px; }
-  .accidental-toggle { font-size: 14px; }
-  .accidental-option { min-width: 16px; height: 28px; padding: 3px 5px; }
-  .accidental-symbol { font-size: 15px; }
-  .key-selector { font-size: 12px; min-width: 40px; height: 28px; padding: 3px 6px; padding-right: 20px; background-size: 10px; }
-  .edit-only-controls.show { max-height: 50px; }
-  
-  /* Responsive chord boxes */
-  .chord-boxes { gap: 6px; }
-  .chord-box { 
-    padding: 6px 8px; 
-    font-size: 12px; 
-    min-width: 32px; 
-  }
-  .chord-box-number {
-    font-size: 9px;
-    margin-bottom: 1px;
-    height: 10px;
-  }
-  
-  .popup-content {
-    min-width: 300px;
-    padding: 20px;
-  }
-  
-  .popup-content h3 {
-    font-size: 18px;
-  }
-  
-  .popup-content textarea {
-    font-size: 14px;
-    padding: 10px;
-  }
-}
+  .key-selector { padding: 4px; font-size: 12px; min-width: 40px; }
+  .accidental-option { padding: 4px; min-width: 16px; }
+  .add-btn, .delete-btn, .new-line-btn { min-width: 28px; height: 28px; font-size: 16px; }
 
-@media (max-width: 480px) {
-  /* Move navigation arrows down more on small mobile when chord mode is off */
-  body:not(.chord-mode-active) .floating-navigation {
-    transform: translateY(20px); /* Even less movement on very small screens */
-  }
-
-  .text { font-size: 14px; }
-  .text-input { font-size: 14px; }
-  .note { width: 24px; }
-  .syllable { min-width: 32px; scroll-margin: 60px; }
-  .arrow-btn { width: 40px; height: 40px; font-size: 16px; }
-  .floating-navigation { gap: 12px; }
-  .bottom-controls { padding: 10px 12px; min-width: 160px; }
-  .bottom-controls-group { gap: 10px; }
-  .edit-controls { font-size: 14px; }
-  .info-icon { width: 15px; height: 15px; font-size: 10px; }
-  .minimize-btn { width: 30px; height: 22px; font-size: 8px; }
-  .bottom-controls-group.minimized .minimize-btn { background-color: #007bff; }
-  .letter-name { font-size: 20px; top: -20px; }
-  .solfege-name { font-size: 12px; }
-  .add-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
-  .delete-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
-  .new-line-btn { font-size: 14px; min-width: 24px; height: 24px; padding: 2px 5px; }
-  .icon-btn { min-width: 24px; height: 24px; padding: 2px 4px; }
-  .icon-btn .glasses-icon { width: 20px; height: 14px; }
-  .icon-btn .piano-keys-icon { width: 20px; height: 16px; }
-  .accidental-toggle { font-size: 12px; }
-  .accidental-option { min-width: 14px; height: 24px; padding: 2px 4px; }
-  .accidental-symbol { font-size: 13px; }
-  .key-selector { font-size: 11px; min-width: 35px; height: 24px; padding: 2px 5px; padding-right: 18px; background-size: 8px; }
-  .edit-only-controls.show { max-height: 40px; }
-  
-  /* Small screen chord boxes */
-  .chord-boxes { 
-    gap: 4px; 
-    flex-wrap: wrap;
-    max-width: 320px;
-  }
-  .chord-box { 
-    padding: 4px 6px; 
-    font-size: 10px; 
-    min-width: 28px; 
-  }
-  .chord-box-number {
-    font-size: 8px;
-    margin-bottom: 1px;
-    height: 9px;
-  }
-  
   .popup-content {
-    min-width: 280px;
+    min-width: 0;
+    width: 95%;
     padding: 16px;
   }
-  
+
   .popup-buttons {
     flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
   }
-  
-  .popup-btn {
-    width: 100%;
+
+  .popup-mode-toggle {
+    justify-content: center;
+  }
+
+  .popup-action-buttons {
+    justify-content: flex-end;
   }
 }
