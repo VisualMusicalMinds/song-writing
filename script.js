@@ -191,6 +191,20 @@ const noteToSolfege = {
   'do-high': 'Do', 're-high': 'Re', 'mi-high': 'Mi'
 };
 
+const noteToShorthandMap = {
+    'so-low': 'S-1', 'la-low': 'L-1', 'ti-low': 'T-1',
+    'do': 'D1', 're': 'R1', 'mi': 'M1', 'fa': 'F1',
+    'so': 'S1', 'la': 'L1', 'ti': 'T1',
+    'do-high': 'D2', 're-high': 'R2', 'mi-high': 'M2'
+};
+
+const shorthandToNoteMap = {
+    'S-1': 'so-low', 'L-1': 'la-low', 'T-1': 'ti-low',
+    'D1': 'do', 'R1': 're', 'M1': 'mi', 'F1': 'fa',
+    'S1': 'so', 'L1': 'la', 'T1': 'ti',
+    'D2': 'do-high', 'R2': 're-high', 'M2': 'mi-high'
+};
+
 // ===== ELEMENT REFERENCES =====
 const editModeCheckbox = document.getElementById('editMode');
 const editToggleBtn = document.getElementById('editToggle');
@@ -213,6 +227,8 @@ const submitNewLine = document.getElementById('submitNewLine');
 const editOnlyControls = document.getElementById('editOnlyControls');
 const chordToggle = document.getElementById('chordToggle');
 const chordBoxes = document.getElementById('chordBoxes');
+const popupModeToggle = document.querySelector('.popup-mode-toggle');
+const copyLyricsBtn = document.getElementById('copyLyricsBtn');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
@@ -225,6 +241,8 @@ let currentEditingIndex = -1;
 let isAdvancingToNext = false;
 let deleteConfirmationState = false;
 const DOUBLE_CLICK_DELAY = 300;
+let newLineMode = 'add'; // 'add' or 'replace'
+
 // ===== UTILITY FUNCTIONS =====
 function getAllSyllables() {
   return document.querySelectorAll('.syllable');
@@ -274,27 +292,18 @@ function handleSolfegeKeyInput(key) {
   const noteElement = currentSyllable.querySelector('.note');
   
   if (noteElement) {
-    // Remove current note class
     const currentNoteClass = Array.from(noteElement.classList).find(c => noteOrder.includes(c));
     if (currentNoteClass) {
       noteElement.classList.remove(currentNoteClass);
     }
-    
-    // Add new note class
     noteElement.classList.add(noteClass);
-    
-    // Remove any accidentals and reset accidental mode
     removeAccidentalFromNote(noteElement);
     resetAccidentalToggleVisuals();
-    
-    // Update display and play sound
     updateNoteDisplay(noteElement, noteClass);
     const frequency = getFrequencyForNote(noteClass);
     if (frequency !== null) playNote(frequency);
-    
     return true;
   }
-  
   return false;
 }
 
@@ -322,11 +331,9 @@ function updateChordBoxesVisibility() {
 
 function applyChordColors() {
   const colors = noteColorsByKey[currentKey];
-  
   document.querySelectorAll('.chord-box').forEach(chordBox => {
     const chordName = chordBox.getAttribute('data-chord');
     const solfegeKey = chordColorMapping[chordName];
-    
     if (solfegeKey && colors[solfegeKey]) {
       const color = colors[solfegeKey];
       chordBox.style.backgroundColor = color;
@@ -337,11 +344,9 @@ function applyChordColors() {
 
 function updateChordBoxLabels() {
   const chordNames = chordNamesByKey[currentKey];
-  
   document.querySelectorAll('.chord-box').forEach(chordBox => {
     const romanNumeral = chordBox.getAttribute('data-chord');
     const chordName = chordNames[romanNumeral];
-    
     if (showNames && chordName) {
       chordBox.textContent = chordName;
     } else {
@@ -352,20 +357,15 @@ function updateChordBoxLabels() {
 
 function handleChordBoxClick(chordBox) {
   const chordName = chordBox.getAttribute('data-chord');
-  
   document.querySelectorAll('.chord-box').forEach(box => box.classList.remove('selected'));
-  
   chordBox.classList.add('selected');
   selectedChord = chordName;
-  
   playChord(chordName);
-  
   console.log(`Selected chord: ${chordName}`);
 }
 
 function selectChordByKeyNumber(keyNumber) {
   if (!chordMode) return;
-  
   const chordBox = document.querySelector(`[data-key="${keyNumber}"]`);
   if (chordBox) {
     handleChordBoxClick(chordBox);
@@ -378,35 +378,25 @@ function playChord(chordSymbol) {
     console.warn(`Chord ${chordSymbol} not found for key ${currentKey}`);
     return;
   }
-  
   const frequencies = noteNames.map(noteName => NOTE_FREQUENCIES[noteName]).filter(freq => freq);
-  
   if (frequencies.length === 0) {
     console.warn(`No valid frequencies found for chord ${chordSymbol} in key ${currentKey}`);
-    console.log('Note names:', noteNames);
     return;
   }
-  
   console.log(`Playing chord ${chordSymbol} in key ${currentKey}:`, noteNames, 'frequencies:', frequencies);
-  
   const now = audioCtx.currentTime;
   const chordDuration = 1.5;
-  
   frequencies.forEach(frequency => {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    
     oscillator.type = 'triangle';
     oscillator.frequency.setValueAtTime(frequency, now);
-    
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
     gainNode.gain.setValueAtTime(0, now);
     gainNode.gain.linearRampToValueAtTime(0.15, now + 0.02);
     gainNode.gain.linearRampToValueAtTime(0.1, now + 0.1);
     gainNode.gain.linearRampToValueAtTime(0, now + chordDuration);
-    
     oscillator.start(now);
     oscillator.stop(now + chordDuration);
   });
@@ -415,10 +405,7 @@ function playChord(chordSymbol) {
 // ===== FREQUENCY CALCULATION FUNCTIONS =====
 function calculateFrequency(key, solfegeWithOctave, accidental = 'natural') {
   const tonicChromaticIndex = KEY_SIGNATURES_CHROMATIC_INDEX[key];
-  if (typeof tonicChromaticIndex === 'undefined') {
-    console.error(`Unknown key for frequency calculation: ${key}`);
-    return null;
-  }
+  if (typeof tonicChromaticIndex === 'undefined') return null;
   let baseSolfegeLowercase = solfegeWithOctave; 
   let octaveShift = 0;
   if (solfegeWithOctave.endsWith('-low')) {
@@ -430,23 +417,14 @@ function calculateFrequency(key, solfegeWithOctave, accidental = 'natural') {
   }
   const baseSolfegeCapitalized = baseSolfegeLowercase.charAt(0).toUpperCase() + baseSolfegeLowercase.slice(1); 
   const solfegeInterval = SOLFEGE_INTERVALS[baseSolfegeCapitalized];
-  if (typeof solfegeInterval === 'undefined') {
-    console.error(`Solfege interval not found for: ${baseSolfegeCapitalized} (derived from ${solfegeWithOctave})`);
-    return null; 
-  }
+  if (typeof solfegeInterval === 'undefined') return null; 
   let accidentalOffset = 0;
   if (accidental === 'sharp') accidentalOffset = 1;
   else if (accidental === 'flat') accidentalOffset = -1;
   const tonicNoteInDefaultOctaveSemitonesFromC0 = tonicChromaticIndex + DEFAULT_SOLFEGE_OCTAVE * SEMITONES_IN_OCTAVE;
-  const targetNoteSemitonesFromC0 = tonicNoteInDefaultOctaveSemitonesFromC0 + 
-                                    solfegeInterval + 
-                                    accidentalOffset + 
-                                    (octaveShift * SEMITONES_IN_OCTAVE);
+  const targetNoteSemitonesFromC0 = tonicNoteInDefaultOctaveSemitonesFromC0 + solfegeInterval + accidentalOffset + (octaveShift * SEMITONES_IN_OCTAVE);
   const frequency = C0_HZ * Math.pow(2, targetNoteSemitonesFromC0 / SEMITONES_IN_OCTAVE);
-  if (isNaN(frequency)) {
-    console.error(`Calculated frequency is NaN. Inputs: key=${key}, solfege=${solfegeWithOctave}, accidental=${accidental}`);
-    return null;
-  }
+  if (isNaN(frequency)) return null;
   return frequency;
 }
 
@@ -562,58 +540,104 @@ function updateNoteDisplay(noteElement, noteClass) {
 }
 
 // ===== SYLLABLE CREATION FUNCTIONS =====
-function createNewSyllable(syllableText = '-') {
-  const doColor = noteColorsByKey[currentKey]['Do'];
-  const doLetterName = letterNamesByKey[currentKey]['Do'];
+function createNewSyllable(syllableText = '-', noteClass = 'do') {
+  const solfegeKey = noteToSolfege[noteClass];
+  const color = noteColorsByKey[currentKey][solfegeKey];
+  const letterName = letterNamesByKey[currentKey][solfegeKey];
+
   const syllableDiv = document.createElement('div');
   syllableDiv.className = 'syllable';
+  
   const noteDiv = document.createElement('div');
-  noteDiv.className = 'note do'; 
-  noteDiv.style.backgroundColor = doColor;
+  noteDiv.className = `note ${noteClass}`;
+  noteDiv.style.backgroundColor = color;
+  
   const letterNameDiv = document.createElement('div');
   letterNameDiv.className = 'letter-name';
-  letterNameDiv.textContent = doLetterName;
-  letterNameDiv.style.color = doColor;
+  letterNameDiv.textContent = letterName;
+  letterNameDiv.style.color = color;
+
   const solfegeNameDiv = document.createElement('div');
   solfegeNameDiv.className = 'solfege-name';
-  solfegeNameDiv.textContent = 'do'; 
+  solfegeNameDiv.textContent = solfegeKey.toLowerCase();
+  
   const textDiv = document.createElement('div');
   textDiv.className = 'text';
   textDiv.textContent = syllableText;
+
   noteDiv.appendChild(letterNameDiv);
   noteDiv.appendChild(solfegeNameDiv);
   syllableDiv.appendChild(noteDiv);
   syllableDiv.appendChild(textDiv);
+  
   return syllableDiv;
 }
 
-function createNewLineFromText(text) {
-  const syllables = text.trim().split(/\s+/).filter(syllable => syllable.length > 0);
-  
-  if (syllables.length === 0) {
-    console.warn("No syllables found in input text");
-    return;
-  }
+function createNewLineFromText(text, mode = 'add') {
+    const notationContainer = document.querySelector('.notation-container');
 
-  const newLine = document.createElement('div');
-  newLine.className = 'notation-line overflow';
-  
-  syllables.forEach(syllableText => {
-    const syllable = createNewSyllable(syllableText);
-    addSyllableEventListeners(syllable);
-    newLine.appendChild(syllable);
-  });
-  
-  const notationContainer = document.querySelector('.notation-container');
-  notationContainer.appendChild(newLine);
-  
-  const firstSyllable = newLine.querySelector('.syllable');
-  if (firstSyllable) {
-    setSyllableAsActive(firstSyllable);
-    scrollToSyllable(firstSyllable);
-  }
-  
-  console.log(`Created new line with ${syllables.length} syllables:`, syllables);
+    if (mode === 'replace') {
+        notationContainer.innerHTML = '';
+        currentSyllableIndex = -1;
+        navigationOffEndState = null;
+        updateDeleteButtonState();
+    }
+
+    const syllableStrings = text.trim().split(/\s+/).filter(s => s.length > 0);
+
+    if (syllableStrings.length === 0) {
+        console.log(mode === 'replace' ? 'Cleared all content.' : 'No syllables to add.');
+        return;
+    }
+
+    const newLine = document.createElement('div');
+    newLine.className = 'notation-line overflow';
+
+    syllableStrings.forEach(syllableString => {
+        let lyric = syllableString;
+        let noteClass = 'do';
+        let accidentalType = 'natural';
+
+        const match = syllableString.match(/(.+)\[([A-Z])([#b]?)?(-?\d+)\]$/i);
+        
+        if (match) {
+            const potentialLyric = match[1];
+            const baseLetter = match[2].toUpperCase();
+            const accidentalChar = match[3] || '';
+            const octave = match[4];
+            const shorthandKey = `${baseLetter}${octave}`;
+            const mappedNoteClass = shorthandToNoteMap[shorthandKey];
+
+            if (mappedNoteClass) {
+                lyric = potentialLyric;
+                noteClass = mappedNoteClass;
+                if (accidentalChar === '#') {
+                    accidentalType = 'sharp';
+                } else if (accidentalChar.toLowerCase() === 'b') {
+                    accidentalType = 'flat';
+                }
+            }
+        }
+        
+        const syllable = createNewSyllable(lyric, noteClass);
+        if (accidentalType !== 'natural') {
+            const noteElement = syllable.querySelector('.note');
+            addAccidentalToNote(noteElement, accidentalType);
+        }
+        
+        addSyllableEventListeners(syllable);
+        newLine.appendChild(syllable);
+    });
+
+    notationContainer.appendChild(newLine);
+
+    const firstSyllable = newLine.querySelector('.syllable');
+    if (firstSyllable) {
+        setSyllableAsActive(firstSyllable);
+        scrollToSyllable(firstSyllable);
+    }
+    
+    console.log(`Created new line with ${syllableStrings.length} syllables in "${mode}" mode.`);
 }
 
 function addSyllableAfterCurrent() {
@@ -700,7 +724,6 @@ function finishTextEdit() {
   const syllable = currentlyEditingText.closest('.syllable');
   const input = syllable.querySelector('.text-input');
   if (input) { 
-    // Use dash as default if input is empty
     const inputValue = input.value.trim();
     currentlyEditingText.textContent = inputValue || '-'; 
     input.remove(); 
@@ -717,16 +740,12 @@ function finishTextEditAndAdvance() {
   
   const syllables = getAllSyllables(); 
   const currentSyllable = syllables[currentEditingIndex];
-  const currentLine = currentSyllable.closest('.notation-line');
-  const syllablesInCurrentLine = currentLine.querySelectorAll('.syllable');
-  const indexInLine = Array.from(syllablesInCurrentLine).indexOf(currentSyllable);
   const nextIndex = currentEditingIndex + 1; 
   isAdvancingToNext = true;
   
   const syllable = currentlyEditingText.closest('.syllable'); 
   const input = syllable.querySelector('.text-input');
   if (input) { 
-    // Use dash as default if input is empty
     const inputValue = input.value.trim();
     currentlyEditingText.textContent = inputValue || '-'; 
     input.remove(); 
@@ -738,49 +757,20 @@ function finishTextEditAndAdvance() {
   
   if (nextIndex < syllables.length) {
     const nextSyllable = syllables[nextIndex];
-    const nextLine = nextSyllable.closest('.notation-line');
-    
-    if (nextLine === currentLine) {
-      const nextTextElement = nextSyllable.querySelector('.text');
-      if (nextTextElement) { 
-        scrollToSyllable(nextSyllable); 
-        setTimeout(() => { 
-          isAdvancingToNext = false; 
-          startTextEdit(nextTextElement); 
-        }, 50); 
-      } else {
-        isAdvancingToNext = false;
-      }
+    const nextTextElement = nextSyllable.querySelector('.text');
+    if (nextTextElement) { 
+      scrollToSyllable(nextSyllable); 
+      setTimeout(() => { 
+        isAdvancingToNext = false; 
+        startTextEdit(nextTextElement); 
+      }, 50); 
     } else {
-      if (editModeCheckbox.checked) {
-        setSyllableAsActive(currentSyllable);
-        
-        const newSyllable = addSyllableAfterCurrent();
-        
-        if (newSyllable) {
-          const newTextElement = newSyllable.querySelector('.text');
-          if (newTextElement) {
-            scrollToSyllable(newSyllable);
-            setTimeout(() => {
-              isAdvancingToNext = false;
-              startTextEdit(newTextElement);
-            }, 50);
-          } else {
-            isAdvancingToNext = false;
-          }
-        } else {
-          isAdvancingToNext = false;
-        }
-      } else {
-        isAdvancingToNext = false;
-      }
+      isAdvancingToNext = false;
     }
   } else {
     if (editModeCheckbox.checked) {
       setSyllableAsActive(currentSyllable);
-      
       const newSyllable = addSyllableAfterCurrent();
-      
       if (newSyllable) {
         const newTextElement = newSyllable.querySelector('.text');
         if (newTextElement) {
@@ -811,22 +801,17 @@ function finishTextEditAndGoBack() {
   const syllable = currentlyEditingText.closest('.syllable');
   const input = syllable.querySelector('.text-input');
   
-  // Check if we're deleting a dash (which triggers syllable deletion)
   if (input && input.value.trim() === '-') {
-    // User is trying to delete a dash - delete the syllable instead
     syllable.classList.remove('editing');
     currentlyEditingText = null;
     currentEditingIndex = -1;
     isAdvancingToNext = false;
-    
-    // Set this syllable as active and delete it
     setSyllableAsActive(syllable);
     deleteSyllable();
     return;
   }
   
   if (input) {
-    // Use dash as default if input is empty
     const inputValue = input.value.trim();
     currentlyEditingText.textContent = inputValue || '-';
     input.remove();
@@ -845,8 +830,6 @@ function finishTextEditAndGoBack() {
       setTimeout(() => {
         isAdvancingToNext = false;
         startTextEdit(previousTextElement);
-        
-        // Select all text in the previous input for easy replacement
         const newInput = previousSyllable.querySelector('.text-input');
         if (newInput) {
           newInput.select();
@@ -925,10 +908,39 @@ function changeKey(newKey) {
 
 // ===== NEW LINE POPUP FUNCTIONS =====
 function showNewLinePopup() {
-  if (!editModeCheckbox.checked) return;
-  newLinePopup.classList.add('show');
-  newLineText.value = '';
-  newLineText.focus();
+    if (!editModeCheckbox.checked) return;
+
+    const syllables = getAllSyllables();
+    const formattedLyrics = Array.from(syllables).map(syllable => {
+        const text = syllable.querySelector('.text').textContent;
+        const noteElement = syllable.querySelector('.note');
+        const noteClass = noteOrder.find(cls => noteElement.classList.contains(cls));
+        const accidental = getAccidentalFromNote(noteElement);
+        
+        let shorthand = noteToShorthandMap[noteClass] || 'D1';
+        if (accidental === 'sharp') {
+            shorthand = shorthand.replace(/([A-Z])/, '$1#');
+        } else if (accidental === 'flat') {
+            shorthand = shorthand.replace(/([A-Z])/, '$1b');
+        }
+        
+        return `${text}[${shorthand}]`;
+    }).join(' ');
+
+    newLinePopup.classList.add('show');
+    newLineText.value = formattedLyrics;
+    newLineText.focus();
+    newLineText.select();
+
+    if (formattedLyrics) {
+        newLineMode = 'replace';
+        popupModeToggle.querySelector('[data-mode="replace"]').classList.add('active');
+        popupModeToggle.querySelector('[data-mode="add"]').classList.remove('active');
+    } else {
+        newLineMode = 'add';
+        popupModeToggle.querySelector('[data-mode="add"]').classList.add('active');
+        popupModeToggle.querySelector('[data-mode="replace"]').classList.remove('active');
+    }
 }
 
 function hideNewLinePopup() {
@@ -937,11 +949,9 @@ function hideNewLinePopup() {
 }
 
 function handleNewLineSubmit() {
-  const text = newLineText.value.trim();
-  if (text) {
-    createNewLineFromText(text);
-  }
-  hideNewLinePopup();
+    const text = newLineText.value;
+    createNewLineFromText(text, newLineMode);
+    hideNewLinePopup();
 }
 
 // ===== NOTE EDITING FUNCTIONS =====
@@ -1118,6 +1128,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.chord-box').forEach(chordBox => {
     chordBox.addEventListener('click', () => handleChordBoxClick(chordBox));
   });
+
+  popupModeToggle.addEventListener('click', (event) => {
+    const clickedButton = event.target.closest('.popup-mode-btn');
+    if (!clickedButton) return;
+    newLineMode = clickedButton.dataset.mode;
+    popupModeToggle.querySelectorAll('.popup-mode-btn').forEach(btn => btn.classList.remove('active'));
+    clickedButton.classList.add('active');
+  });
+
+  copyLyricsBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(newLineText.value).then(() => {
+        copyLyricsBtn.classList.add('copied');
+        setTimeout(() => {
+            copyLyricsBtn.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy lyrics: ', err);
+    });
+  });
 });
 
 // ===== EVENT LISTENERS =====
@@ -1211,20 +1240,17 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if (isPopupOpen() || currentlyEditingText) return;
   
-  // Handle number keys for chord selection
   if (event.key >= '1' && event.key <= '9') {
     event.preventDefault();
     selectChordByKeyNumber(event.key);
     return;
   }
   
-  // Handle solfege keyboard input (only in edit mode)
   if (editModeCheckbox.checked && handleSolfegeKeyInput(event.key)) {
     event.preventDefault();
     return;
   }
   
-  // Handle arrow keys and other navigation
   switch(event.key) {
     case 'ArrowLeft': 
       event.preventDefault(); 
