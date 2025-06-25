@@ -10,7 +10,8 @@
     <div class="main-container">
         <div class="notation-container">
             <!-- First Line -->
-            <div class="notation-line original-line1">
+            <div class="notation-line">
+                <input type="text" class="line-label" placeholder="Section Title" maxlength="15">
                 <div class="syllable">
                     <div class="note do">
                         <div class="letter-name">C</div>
@@ -63,7 +64,8 @@
             </div>
 
             <!-- Second Line -->
-            <div class="notation-line original-line2">
+            <div class="notation-line">
+                <input type="text" class="line-label" placeholder="Section Title" maxlength="15">
                 <div class="syllable">
                     <div class="note fa">
                         <div class="letter-name">F</div>
@@ -184,6 +186,16 @@
                 <!-- New Line Button -->
                 <div class="control-group">
                     <button class="new-line-btn" id="newLineBtn" title="Add new line from text">¶</button>
+                </div>
+                
+                <!-- Enter Key Button -->
+                <div class="control-group">
+                    <button class="enter-key-btn" id="enterKeyBtn" title="Create new line">
+                        <svg class="enter-key-icon" viewBox="0 0 24 24" width="24" height="24">
+                            <polyline points="9 10 4 15 9 20" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20 5v10H4" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Delete Syllable Button -->
