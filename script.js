@@ -205,6 +205,8 @@ const shorthandToNoteMap = {
     'D2': 'do-high', 'R2': 're-high', 'M2': 'mi-high'
 };
 
+const LINE_COLORS = ['#f5f5f5', '#f0f8ff', '#fff0f5', '#f0fff0'];
+
 // ===== ELEMENT REFERENCES =====
 const editModeCheckbox = document.getElementById('editMode');
 const editToggleBtn = document.getElementById('editToggle');
@@ -229,6 +231,7 @@ const chordToggle = document.getElementById('chordToggle');
 const chordBoxes = document.getElementById('chordBoxes');
 const popupModeToggle = document.querySelector('.popup-mode-toggle');
 const copyLyricsBtn = document.getElementById('copyLyricsBtn');
+const enterKeyBtn = document.getElementById('enterKeyBtn');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
@@ -240,6 +243,7 @@ let currentlyEditingText = null;
 let currentEditingIndex = -1;
 let isAdvancingToNext = false;
 let deleteConfirmationState = false;
+let enterKeyState = 0; // 0: grey, 1: yellow (confirm), 2: green (active)
 const DOUBLE_CLICK_DELAY = 300;
 let newLineMode = 'add'; // 'add' or 'replace'
 
@@ -274,8 +278,21 @@ function resetDeleteConfirmation() {
     deleteBtn.classList.remove('confirm-delete');
 }
 
+function resetEnterKeyState() {
+    enterKeyState = 0;
+    enterKeyBtn.classList.remove('confirm-enter', 'active-enter');
+}
+
 function isPopupOpen() {
   return newLinePopup.classList.contains('show');
+}
+
+// ===== LINE BACKGROUNDS =====
+function updateLineBackgrounds() {
+    const lines = document.querySelectorAll('.notation-line');
+    lines.forEach((line, index) => {
+        line.style.backgroundColor = LINE_COLORS[index % LINE_COLORS.length];
+    });
 }
 
 // ===== SOLFEGE INPUT FUNCTIONS =====
@@ -539,7 +556,25 @@ function updateNoteDisplay(noteElement, noteClass) {
   }
 }
 
-// ===== SYLLABLE CREATION FUNCTIONS =====
+// ===== SYLLABLE AND LINE CREATION =====
+function createNewLineElement(isSectionBreak = false) {
+    const newNotationLine = document.createElement('div');
+    newNotationLine.className = 'notation-line';
+    if (isSectionBreak) {
+        newNotationLine.classList.add('section-break');
+    }
+
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.className = 'line-label';
+    labelInput.placeholder = 'Section Title';
+    labelInput.maxLength = 15;
+    labelInput.addEventListener('click', (e) => e.stopPropagation());
+
+    newNotationLine.appendChild(labelInput);
+    return newNotationLine;
+}
+
 function createNewSyllable(syllableText = '-', noteClass = 'do') {
   const solfegeKey = noteToSolfege[noteClass];
   const color = noteColorsByKey[currentKey][solfegeKey];
@@ -582,63 +617,68 @@ function createNewLineFromText(text, mode = 'add') {
         navigationOffEndState = null;
         updateDeleteButtonState();
     }
+    
+    const lines = text.trim().split('\n');
+    let currentLineElement = null;
+    let lastCreatedSyllable = null;
 
-    const syllableStrings = text.trim().split(/\s+/).filter(s => s.length > 0);
+    lines.forEach(lineText => {
+        const trimmedLine = lineText.trim();
+        const labelMatch = trimmedLine.match(/^\[(.*)\]$/);
 
-    if (syllableStrings.length === 0) {
-        console.log(mode === 'replace' ? 'Cleared all content.' : 'No syllables to add.');
-        return;
-    }
-
-    const newLine = document.createElement('div');
-    newLine.className = 'notation-line overflow';
-
-    syllableStrings.forEach(syllableString => {
-        let lyric = syllableString;
-        let noteClass = 'do';
-        let accidentalType = 'natural';
-
-        const match = syllableString.match(/(.+)\[([A-Z])([#b]?)?(-?\d+)\]$/i);
-        
-        if (match) {
-            const potentialLyric = match[1];
-            const baseLetter = match[2].toUpperCase();
-            const accidentalChar = match[3] || '';
-            const octave = match[4];
-            const shorthandKey = `${baseLetter}${octave}`;
-            const mappedNoteClass = shorthandToNoteMap[shorthandKey];
-
-            if (mappedNoteClass) {
-                lyric = potentialLyric;
-                noteClass = mappedNoteClass;
-                if (accidentalChar === '#') {
-                    accidentalType = 'sharp';
-                } else if (accidentalChar.toLowerCase() === 'b') {
-                    accidentalType = 'flat';
-                }
+        if (labelMatch) {
+            // This is a label line, create a new notation line
+            const label = labelMatch[1];
+            currentLineElement = createNewLineElement(true);
+            if (label !== 'New Line') {
+                currentLineElement.querySelector('.line-label').value = label;
             }
+            notationContainer.appendChild(currentLineElement);
+        } else if (trimmedLine.length > 0 && currentLineElement) {
+            // This is a syllable line, add syllables to the current notation line
+            const syllableStrings = trimmedLine.split(/\s+/).filter(s => s.length > 0);
+            syllableStrings.forEach(syllableString => {
+                let lyric = syllableString;
+                let noteClass = 'do';
+                let accidentalType = 'natural';
+
+                const noteMatch = syllableString.match(/(.+)\[([A-Z])([#b]?)?(-?\d+)\]$/i);
+                if (noteMatch) {
+                    const potentialLyric = noteMatch[1];
+                    const baseLetter = noteMatch[2].toUpperCase();
+                    const accidentalChar = noteMatch[3] || '';
+                    const octave = noteMatch[4];
+                    const shorthandKey = `${baseLetter}${octave}`;
+                    const mappedNoteClass = shorthandToNoteMap[shorthandKey];
+
+                    if (mappedNoteClass) {
+                        lyric = potentialLyric;
+                        noteClass = mappedNoteClass;
+                        if (accidentalChar === '#') accidentalType = 'sharp';
+                        else if (accidentalChar.toLowerCase() === 'b') accidentalType = 'flat';
+                    }
+                }
+                
+                const syllable = createNewSyllable(lyric, noteClass);
+                if (accidentalType !== 'natural') {
+                    addAccidentalToNote(syllable.querySelector('.note'), accidentalType);
+                }
+                
+                addSyllableEventListeners(syllable);
+                currentLineElement.appendChild(syllable);
+                lastCreatedSyllable = syllable;
+            });
         }
-        
-        const syllable = createNewSyllable(lyric, noteClass);
-        if (accidentalType !== 'natural') {
-            const noteElement = syllable.querySelector('.note');
-            addAccidentalToNote(noteElement, accidentalType);
-        }
-        
-        addSyllableEventListeners(syllable);
-        newLine.appendChild(syllable);
     });
 
-    notationContainer.appendChild(newLine);
+    updateLineBackgrounds();
 
-    const firstSyllable = newLine.querySelector('.syllable');
-    if (firstSyllable) {
-        setSyllableAsActive(firstSyllable);
-        scrollToSyllable(firstSyllable);
+    if (lastCreatedSyllable) {
+        setSyllableAsActive(lastCreatedSyllable);
+        scrollToSyllable(lastCreatedSyllable);
     }
-    
-    console.log(`Created new line with ${syllableStrings.length} syllables in "${mode}" mode.`);
 }
+
 
 function addSyllableAfterCurrent() {
   if (!editModeCheckbox.checked) return;
@@ -653,7 +693,11 @@ function addSyllableAfterCurrent() {
       targetLine = lines[lines.length - 1];
       const lastLineSyllables = targetLine.querySelectorAll('.syllable');
       targetSyllable = lastLineSyllables.length > 0 ? lastLineSyllables[lastLineSyllables.length - 1] : null;
-    } else { console.warn("No notation lines to add syllable to."); return; }
+    } else { 
+        targetLine = createNewLineElement();
+        document.querySelector('.notation-container').appendChild(targetLine);
+        updateLineBackgrounds();
+    }
   }
   if (!targetLine) { console.warn("Target line not found for adding syllable."); return; }
   const newSyllable = createNewSyllable();
@@ -671,8 +715,14 @@ function deleteSyllable() {
   if (currentSyllableIndex >= syllables.length) return;
   
   const syllableToDelete = syllables[currentSyllableIndex];
+  const parentLine = syllableToDelete.closest('.notation-line');
   syllableToDelete.remove();
   
+  if (parentLine && parentLine.querySelectorAll('.syllable').length === 0) {
+      parentLine.remove();
+      updateLineBackgrounds();
+  }
+
   const remainingSyllables = getAllSyllables();
   if (remainingSyllables.length === 0) {
     currentSyllableIndex = -1;
@@ -858,6 +908,7 @@ function toggleEditMode() {
   updateAddButtonState();
   updateDeleteButtonState();
   updateNewLineButtonState();
+  updateEnterKeyButtonState();
 }
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
@@ -895,6 +946,12 @@ function updateNewLineButtonState() {
   newLineBtn.disabled = !editModeCheckbox.checked;
   newLineBtn.classList.toggle('active', editModeCheckbox.checked);
 }
+function updateEnterKeyButtonState() {
+    enterKeyBtn.disabled = !editModeCheckbox.checked || currentSyllableIndex < 0;
+    if (!editModeCheckbox.checked) {
+        resetEnterKeyState();
+    }
+}
 function changeKey(newKey) {
   if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
     currentKey = newKey; 
@@ -910,37 +967,42 @@ function changeKey(newKey) {
 function showNewLinePopup() {
     if (!editModeCheckbox.checked) return;
 
-    const syllables = getAllSyllables();
-    const formattedLyrics = Array.from(syllables).map(syllable => {
-        const text = syllable.querySelector('.text').textContent;
-        const noteElement = syllable.querySelector('.note');
-        const noteClass = noteOrder.find(cls => noteElement.classList.contains(cls));
-        const accidental = getAccidentalFromNote(noteElement);
+    let fullText = '';
+    const lines = document.querySelectorAll('.notation-line');
+
+    lines.forEach(line => {
+        const labelInput = line.querySelector('.line-label');
+        const label = labelInput.value.trim();
+        fullText += `[${label || 'New Line'}]\n`;
+
+        const syllables = line.querySelectorAll('.syllable');
+        const formattedSyllables = Array.from(syllables).map(syllable => {
+            const text = syllable.querySelector('.text').textContent;
+            const noteElement = syllable.querySelector('.note');
+            const noteClass = noteOrder.find(cls => noteElement.classList.contains(cls));
+            const accidental = getAccidentalFromNote(noteElement);
+            
+            let shorthand = noteToShorthandMap[noteClass] || 'D1';
+            if (accidental === 'sharp') {
+                shorthand = shorthand.replace(/([A-Z])/, '$1#');
+            } else if (accidental === 'flat') {
+                shorthand = shorthand.replace(/([A-Z])/, '$1b');
+            }
+            
+            return `${text}[${shorthand}]`;
+        }).join(' ');
         
-        let shorthand = noteToShorthandMap[noteClass] || 'D1';
-        if (accidental === 'sharp') {
-            shorthand = shorthand.replace(/([A-Z])/, '$1#');
-        } else if (accidental === 'flat') {
-            shorthand = shorthand.replace(/([A-Z])/, '$1b');
-        }
-        
-        return `${text}[${shorthand}]`;
-    }).join(' ');
+        fullText += formattedSyllables + '\n';
+    });
 
     newLinePopup.classList.add('show');
-    newLineText.value = formattedLyrics;
+    newLineText.value = fullText.trim();
     newLineText.focus();
     newLineText.select();
 
-    if (formattedLyrics) {
-        newLineMode = 'replace';
-        popupModeToggle.querySelector('[data-mode="replace"]').classList.add('active');
-        popupModeToggle.querySelector('[data-mode="add"]').classList.remove('active');
-    } else {
-        newLineMode = 'add';
-        popupModeToggle.querySelector('[data-mode="add"]').classList.add('active');
-        popupModeToggle.querySelector('[data-mode="replace"]').classList.remove('active');
-    }
+    newLineMode = 'replace';
+    popupModeToggle.querySelector('[data-mode="replace"]').classList.add('active');
+    popupModeToggle.querySelector('[data-mode="add"]').classList.remove('active');
 }
 
 function hideNewLinePopup() {
@@ -979,7 +1041,9 @@ function enterDeselectedState(boundary) {
     navigationOffEndState = boundary;
     resetAccidentalToggleVisuals();
     resetDeleteConfirmation();
+    resetEnterKeyState();
     updateDeleteButtonState();
+    updateEnterKeyButtonState();
 }
 
 function setSyllableAsActive(syllable) {
@@ -992,6 +1056,7 @@ function setSyllableAsActive(syllable) {
     if (isNewNoteBeingSelected || navigationOffEndState !== null) {
       resetAccidentalToggleVisuals();
       resetDeleteConfirmation();
+      resetEnterKeyState();
     }
 
     currentSyllableIndex = newIndex;
@@ -1005,6 +1070,7 @@ function setSyllableAsActive(syllable) {
     if (noteElement) playNoteWithAccidental(noteElement);
     
     updateDeleteButtonState();
+    updateEnterKeyButtonState();
   }
 }
 
@@ -1103,27 +1169,74 @@ function handleDeleteClick() {
   }
 }
 
+function handleEnterKeyClick() {
+    if (!editModeCheckbox.checked || currentSyllableIndex < 0) return;
+
+    enterKeyState++;
+
+    switch (enterKeyState) {
+        case 1: // First click: turn yellow (confirm state)
+            enterKeyBtn.classList.add('confirm-enter');
+            enterKeyBtn.classList.remove('active-enter');
+            break;
+        case 2: // Second click: turn green, perform action
+            enterKeyBtn.classList.remove('confirm-enter');
+            enterKeyBtn.classList.add('active-enter');
+            
+            const syllables = getAllSyllables();
+            const currentSyllable = syllables[currentSyllableIndex];
+            const currentLine = currentSyllable.closest('.notation-line');
+            
+            const syllablesInLine = Array.from(currentLine.querySelectorAll('.syllable'));
+            const splitIndex = syllablesInLine.indexOf(currentSyllable);
+
+            if (splitIndex >= 0) {
+                const newNotationLine = createNewLineElement(true); // true for section break
+                
+                const syllablesToMove = syllablesInLine.slice(splitIndex);
+                syllablesToMove.forEach(syllableToMove => newNotationLine.appendChild(syllableToMove));
+                
+                currentLine.after(newNotationLine);
+                updateLineBackgrounds();
+                setSyllableAsActive(newNotationLine.querySelector('.syllable'));
+            }
+            break;
+    }
+    
+    if (enterKeyState >= 2) {
+        setTimeout(() => resetEnterKeyState(), 500);
+    }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
   accidentalMode = 'natural'; 
   currentSyllableIndex = -1;
   navigationOffEndState = null;
   deleteConfirmationState = false;
+  enterKeyState = 0;
   chordMode = false;
   selectedChord = null;
   showNames = false;
+  
+  updateLineBackgrounds();
   applyNoteColors(); 
   applyChordColors();
   updateChordBoxLabels();
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
+  updateEnterKeyButtonState();
   updateEditOnlyControlsVisibility();
   updateChordBoxesVisibility();
   syncEditButtonState(); 
+  
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
   document.querySelectorAll('.syllable').forEach(syllable => addSyllableEventListeners(syllable));
+  document.querySelectorAll('.line-label').forEach(label => {
+      label.addEventListener('click', e => e.stopPropagation());
+  });
   
   document.querySelectorAll('.chord-box').forEach(chordBox => {
     chordBox.addEventListener('click', () => handleChordBoxClick(chordBox));
@@ -1159,6 +1272,7 @@ rightArrowBtn.addEventListener('click', navigateRight);
 addBtn.addEventListener('click', addSyllableAfterCurrent);
 newLineBtn.addEventListener('click', showNewLinePopup);
 deleteBtn.addEventListener('click', handleDeleteClick);
+enterKeyBtn.addEventListener('click', handleEnterKeyClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
 
 cancelNewLine.addEventListener('click', hideNewLinePopup);
@@ -1182,9 +1296,11 @@ editModeCheckbox.addEventListener('change', () => {
   updateAddButtonState(); 
   updateDeleteButtonState();
   updateNewLineButtonState();
+  updateEnterKeyButtonState();
   if (!editModeCheckbox.checked) {
     resetAccidentalToggleVisuals();
     resetDeleteConfirmation();
+    resetEnterKeyState();
     hideNewLinePopup();
     navigationOffEndState = null; 
   }
@@ -1235,10 +1351,13 @@ document.addEventListener('click', (event) => {
   if (!event.target.closest('#deleteBtn') && deleteConfirmationState) {
     resetDeleteConfirmation();
   }
+  if (!event.target.closest('#enterKeyBtn')) {
+    resetEnterKeyState();
+  }
 });
 
 document.addEventListener('keydown', (event) => {
-  if (isPopupOpen() || currentlyEditingText) return;
+  if (isPopupOpen() || currentlyEditingText || event.target.classList.contains('line-label')) return;
   
   if (event.key >= '1' && event.key <= '9') {
     event.preventDefault();
