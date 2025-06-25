@@ -26,29 +26,51 @@ body {
 
 /* ===== NOTATION LINES ===== */
 .notation-line {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-end;
   min-height: 200px;
   padding: 20px;
+  padding-top: 40px; /* Added padding to make space for the label */
   background-color: #f5f5f5;
   box-sizing: border-box;
   border-radius: 8px;
   width: 100%;
   gap: 4px;
+  transition: background-color 0.5s ease;
 }
 
-.notation-line.original-line1 {
-  background-color: #f5f5f5;
+.notation-line.section-break {
+    margin-top: 40px;
 }
 
-.notation-line.original-line2 {
-  background-color: #f0f8ff;
+/* ===== LINE LABEL ===== */
+.line-label {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+    font-size: 14px;
+    color: #555;
+    width: 150px;
+    padding: 4px;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-.notation-line.overflow {
-  background-color: #fff0f5;
+.line-label::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.line-label:focus {
+    border-bottom-color: #007bff;
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 /* ===== SYLLABLES ===== */
@@ -845,6 +867,70 @@ body:not(.chord-mode-active) .floating-navigation {
   transform: none;
 }
 
+/* ===== ENTER KEY BUTTON ===== */
+.enter-key-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.enter-key-btn .enter-key-icon {
+  color: currentColor;
+}
+
+.enter-key-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.enter-key-btn.confirm-enter {
+  background-color: #ffc107;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4),
+              0 0 0 6px rgba(255, 193, 7, 0.2);
+  animation: yellowPulse 1.5s infinite;
+}
+
+.enter-key-btn.active-enter {
+  background-color: #28a745;
+}
+
+@keyframes yellowPulse {
+  0% {
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4),
+                0 0 0 6px rgba(255, 193, 7, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.6),
+                0 0 0 12px rgba(255, 193, 7, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4),
+                0 0 0 6px rgba(255, 193, 7, 0.2);
+  }
+}
+
+.enter-key-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  background-color: #6c757d;
+}
+
+.enter-key-btn:disabled:hover {
+  filter: none;
+  transform: none;
+}
+
 /* ===== HINTS ===== */
 .hints {
   display: flex;
@@ -1052,7 +1138,7 @@ html {
   .info-icon { width: 16px; height: 16px; font-size: 11px; }
   .key-selector { padding: 4px; font-size: 12px; min-width: 40px; }
   .accidental-option { padding: 4px; min-width: 16px; }
-  .add-btn, .delete-btn, .new-line-btn { min-width: 28px; height: 28px; font-size: 16px; }
+  .add-btn, .delete-btn, .new-line-btn, .enter-key-btn { min-width: 28px; height: 28px; font-size: 16px; }
 
   .popup-content {
     min-width: 0;
