@@ -129,21 +129,23 @@ const KEY_TRANSPOSITION = {
 // ===== SOLFEGE KEYBOARD MAPPING =====
 const solfegeKeyMap = {
   'z': 'so-low',     // So-1
-  'x': 'la-low',     // La-1  
+  'x': 'la-low',     // La-1
   'c': 'ti-low',     // Ti-1
+  'v': 'do',         // Do1
   'a': 'do',         // Do1
   's': 're',         // Re1
   'd': 'mi',         // Mi1
   'f': 'fa',         // Fa1
-  'q': 'so',         // So1
-  'w': 'la',         // La1
-  'e': 'ti',         // Ti1
-  'r': 'do-high',    // Do2
-  't': 're-high',    // Re2
-  'y': 'mi-high',    // Mi2
-  'u': 'fa-high',    // Fa2
-  'i': 'so-high',    // So2
-  'o': 'la-high'     // La2
+  'g': 'so',         // So1
+  'h': 'la',         // La1
+  'j': 'ti',         // Ti1
+  'k': 'do-high',    // Do2
+  'q': 'do-high',    // Do2
+  'w': 're-high',    // Re2
+  'e': 'mi-high',    // Mi2
+  'r': 'fa-high',    // Fa2
+  't': 'so-high',    // So2
+  'y': 'la-high'     // La2
 };
 
 function transposeNote(noteWithOctave, semitonesUp, octaveShift = 0) {
@@ -266,6 +268,7 @@ const copyVisualBtn = document.getElementById('copyVisualBtn');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
+let currentRowTop = null; // To track the vertical position of the current visual row
 let navigationOffEndState = null;
 let clickTimer = null;
 let infoVisible = false;
@@ -285,16 +288,27 @@ function getAllSyllables() {
 
 function scrollToSyllable(syllable) {
   if (!syllable) return;
-  
-  const rect = syllable.getBoundingClientRect();
-  const currentScrollY = window.pageYOffset;
-  const syllableTop = rect.top + currentScrollY;
-  const topOffset = 60;
-  
-  window.scrollTo({
-    top: syllableTop - topOffset,
-    behavior: 'smooth'
-  });
+
+  const syllableRect = syllable.getBoundingClientRect();
+  const newRowTop = syllableRect.top;
+
+  // Check if the syllable is on a new visual row (with a small tolerance)
+  if (currentRowTop === null || Math.abs(newRowTop - currentRowTop) > 10) {
+    currentRowTop = newRowTop; // Update the current row position
+
+    const viewportHeight = window.innerHeight;
+    const scrollY = window.pageYOffset;
+    const syllableBottom = scrollY + syllableRect.bottom;
+
+    // Calculate the desired scroll position to place the bottom of the syllable
+    // at 60% of the viewport height. This creates a stable anchor point.
+    const targetScrollY = syllableBottom - (viewportHeight * 0.6);
+
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: 'smooth'
+    });
+  }
 }
 
 function resetAccidentalToggleVisuals() {
@@ -1233,6 +1247,7 @@ function enterDeselectedState(boundary) {
     const syllables = getAllSyllables();
     syllables.forEach(s => s.classList.remove('highlighted'));
     currentSyllableIndex = -1;
+    currentRowTop = null; // Reset current row position when deselected
     navigationOffEndState = boundary;
     resetAccidentalToggleVisuals();
     resetDeleteConfirmation();
@@ -1409,6 +1424,7 @@ function handleEnterKeyClick() {
 document.addEventListener('DOMContentLoaded', () => {
   accidentalMode = 'natural'; 
   currentSyllableIndex = -1;
+  currentRowTop = null;
   navigationOffEndState = null;
   deleteConfirmationState = false;
   enterKeyState = 0;
