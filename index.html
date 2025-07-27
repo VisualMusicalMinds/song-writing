@@ -172,17 +172,6 @@
         <div class="bottom-controls">
             <!-- Edit-Only Controls Row (Hidden by default) -->
             <div class="edit-controls edit-only-controls" id="editOnlyControls">
-                <!-- Accidental Toggle Button -->
-                <div class="accidental-toggle" id="accidentalToggle" title="Accidentals: Flat, Sharp">
-                    <div class="accidental-option" data-type="flat">♭</div>
-                    <div class="accidental-option" data-type="sharp">♯</div>
-                </div>
-                
-                <!-- Add Syllable Button -->
-                <div class="control-group">
-                    <button class="add-btn" id="addBtn">+</button>
-                </div>
-
                 <!-- New Line Button -->
                 <div class="control-group">
                     <button class="new-line-btn" id="newLineBtn" title="Add new line from text">¶</button>
@@ -196,6 +185,17 @@
                             <path d="M20 5v10H4" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Accidental Toggle Button -->
+                <div class="accidental-toggle" id="accidentalToggle" title="Accidentals: Flat, Sharp">
+                    <div class="accidental-option" data-type="flat">♭</div>
+                    <div class="accidental-option" data-type="sharp">♯</div>
+                </div>
+                
+                <!-- Add Syllable Button -->
+                <div class="control-group">
+                    <button class="add-btn" id="addBtn">+</button>
                 </div>
 
                 <!-- Delete Syllable Button -->
@@ -284,6 +284,11 @@
                         </svg>
                     </button>
                 </div>
+
+                <!-- Copy Visual Button -->
+                <div class="control-group">
+                    <button class="icon-btn" id="copyVisualBtn" title="Copy visual">📷</button>
+                </div>
             </div>
 
             <!-- Hints Section -->
@@ -320,6 +325,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
