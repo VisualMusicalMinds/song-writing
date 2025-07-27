@@ -191,6 +191,7 @@ let showNames = false;
 let accidentalMode = 'natural'; 
 let chordMode = false;
 let selectedChord = null;
+let uploadMode = false;
 
 const A4_HZ = 440.0;
 const SEMITONES_IN_OCTAVE = 12;
@@ -265,6 +266,9 @@ const popupModeToggle = document.querySelector('.popup-mode-toggle');
 const copyLyricsBtn = document.getElementById('copyLyricsBtn');
 const enterKeyBtn = document.getElementById('enterKeyBtn');
 const copyVisualBtn = document.getElementById('copyVisualBtn');
+const uploadBtn = document.getElementById('uploadBtn');
+const uploadControls = document.getElementById('uploadControls');
+const preloadedSongsSelector = document.getElementById('preloadedSongsSelector');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
@@ -831,9 +835,9 @@ function createNewLineFromText(text, mode = 'add') {
     updateLineBackgrounds();
     updateAllLineHeights();
 
-    if (lastCreatedSyllable) {
-        setSyllableAsActive(lastCreatedSyllable);
-        scrollToSyllable(lastCreatedSyllable);
+    const firstSyllable = notationContainer.querySelector('.syllable');
+    if (firstSyllable) {
+        setSyllableAsActive(firstSyllable);
     }
 }
 
@@ -1072,6 +1076,11 @@ function toggleEditMode() {
   updateNewLineButtonState();
   updateEnterKeyButtonState();
 }
+function toggleUploadMode() {
+    uploadMode = !uploadMode;
+    uploadBtn.classList.toggle('active', uploadMode);
+    uploadControls.classList.toggle('show', uploadMode);
+}
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
   showNames = !showNames;
@@ -1145,6 +1154,37 @@ function changeKey(newKey) {
     }
 }
 
+// ===== SONG LOADING FUNCTIONS =====
+function loadSongFromText(text) {
+    let songText = text;
+    let finalKey = currentKey;
+
+    const keyMatch = songText.match(/^\[Key of (.*?)\]\n?/);
+    if (keyMatch) {
+        const potentialKey = keyMatch[1];
+        if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(potentialKey)) {
+            finalKey = potentialKey;
+        }
+        songText = songText.substring(keyMatch[0].length);
+    }
+
+    if (finalKey !== currentKey) {
+        changeKey(finalKey);
+    }
+
+    if (songText.trim() && !songText.trim().startsWith('[')) {
+        songText = '[New Line]\n' + songText;
+    }
+    
+    createNewLineFromText(songText, 'replace');
+}
+
+function loadPreloadedSong(songKey) {
+    if (PRELOADED_SONGS[songKey]) {
+        loadSongFromText(PRELOADED_SONGS[songKey]);
+    }
+}
+
 // ===== NEW LINE POPUP FUNCTIONS =====
 function showNewLinePopup() {
     if (!editModeCheckbox.checked) return;
@@ -1195,32 +1235,7 @@ function hideNewLinePopup() {
 }
 
 function handleNewLineSubmit() {
-    let text = newLineText.value;
-    let finalKey = currentKey;
-
-    // Check for a key tag
-    const keyMatch = text.match(/^\[Key of (.*?)\]\n?/);
-    if (keyMatch) {
-        const potentialKey = keyMatch[1];
-        // Use the new KEY_SIGNATURES_CHROMATIC_INDEX which includes sharp keys
-        if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(potentialKey)) {
-            finalKey = potentialKey;
-        }
-        // Remove the key tag from the text to be processed
-        text = text.substring(keyMatch[0].length);
-    }
-
-    // Update the app's key if it changed
-    if (finalKey !== currentKey) {
-        changeKey(finalKey);
-    }
-
-    // Ensure the text has a section tag if it's not empty
-    if (text.trim() && !text.trim().startsWith('[')) {
-        text = '[New Line]\n' + text;
-    }
-    
-    createNewLineFromText(text, newLineMode);
+    loadSongFromText(newLineText.value);
     hideNewLinePopup();
 }
 
@@ -1431,9 +1446,8 @@ document.addEventListener('DOMContentLoaded', () => {
   chordMode = false;
   selectedChord = null;
   showNames = false;
+  uploadMode = false;
   
-  updateLineBackgrounds();
-  updateAllLineHeights();
   applyNoteColors(); 
   applyChordColors();
   updateChordBoxLabels();
@@ -1443,10 +1457,17 @@ document.addEventListener('DOMContentLoaded', () => {
   updateEnterKeyButtonState();
   updateEditOnlyControlsVisibility();
   updateChordBoxesVisibility();
-  syncEditButtonState(); 
+  syncEditButtonState();
+  
+  uploadControls.classList.remove('show');
+  uploadBtn.classList.remove('active');
   
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
+  
+  // Load default song
+  loadPreloadedSong('twinkle');
+  
   document.querySelectorAll('.syllable').forEach(syllable => addSyllableEventListeners(syllable));
   document.querySelectorAll('.line-label').forEach(label => {
       label.addEventListener('click', e => e.stopPropagation());
@@ -1492,6 +1513,14 @@ newLineBtn.addEventListener('click', showNewLinePopup);
 deleteBtn.addEventListener('click', handleDeleteClick);
 enterKeyBtn.addEventListener('click', handleEnterKeyClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
+uploadBtn.addEventListener('click', toggleUploadMode);
+
+preloadedSongsSelector.addEventListener('change', (event) => {
+    const songKey = event.target.value;
+    if (songKey) {
+        loadPreloadedSong(songKey);
+    }
+});
 
 cancelNewLine.addEventListener('click', hideNewLinePopup);
 submitNewLine.addEventListener('click', handleNewLineSubmit);
