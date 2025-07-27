@@ -6,15 +6,8 @@ body {
   background-color: #fafafa;
 }
 
-/* Styles for capturing (temporarily hide interactive elements) */
-body.capturing .syllable.highlighted {
-    background-color: transparent !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-body.capturing .syllable:hover {
-    background-color: transparent !important;
+body.capturing {
+    background-color: #fafafa !important;
 }
 
 .main-container {
@@ -30,7 +23,7 @@ body.capturing .syllable:hover {
 .notation-container {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 20px;
   width: 100%;
   align-items: center;
 }
@@ -42,9 +35,9 @@ body.capturing .syllable:hover {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-end;
-  min-height: 200px;
+  min-height: 100px;
   padding: 20px;
-  padding-top: 40px; /* Added padding to make space for the label */
+  padding-top: 40px; 
   background-color: #f5f5f5;
   box-sizing: border-box;
   border-radius: 8px;
@@ -54,7 +47,7 @@ body.capturing .syllable:hover {
 }
 
 .notation-line.section-break {
-    margin-top: 0;
+    margin-top: 40px;
 }
 
 /* ===== LINE LABEL ===== */
@@ -91,7 +84,6 @@ body.capturing .syllable:hover {
   justify-content: flex-end;
   align-items: center;
   min-width: 40px;
-  height: 200px;
   box-sizing: border-box;
   padding: 4px;
   border-radius: 8px;
@@ -138,19 +130,23 @@ body.capturing .syllable:hover {
 }
 
 /* Note Heights */
-.so-low  { height: 15%; }
-.la-low  { height: 20%; }
-.ti-low  { height: 25%; }
-.do      { height: 30%; }
-.re      { height: 35%; }
-.mi      { height: 40%; }
-.fa      { height: 45%; }
-.so      { height: 50%; }
-.la      { height: 55%; }
-.ti      { height: 60%; }
-.do-high { height: 65%; }
-.re-high { height: 70%; }
-.mi-high { height: 75%; }
+.so-low  { height: 30px; }
+.la-low  { height: 40px; }
+.ti-low  { height: 50px; }
+.do      { height: 60px; }
+.re      { height: 70px; }
+.mi      { height: 80px; }
+.fa      { height: 90px; }
+.so      { height: 100px; }
+.la      { height: 110px; }
+.ti      { height: 120px; }
+.do-high { height: 130px; }
+.re-high { height: 140px; }
+.mi-high { height: 150px; }
+.fa-high { height: 160px; }
+.so-high { height: 170px; }
+.la-high { height: 180px; }
+
 
 /* ===== ACCIDENTAL SYMBOLS ===== */
 .accidental-symbol {
@@ -159,7 +155,7 @@ body.capturing .syllable:hover {
   left: 50%;
   transform: translateX(-50%);
   color: white;
-  font-size: 18px; /* Increased from 12px to 18px (50% larger) */
+  font-size: 18px;
   font-weight: bold;
   font-family: 'Times New Roman', serif;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
@@ -249,11 +245,6 @@ body.capturing .syllable:hover {
   gap: 15px;
   z-index: 150;
   transition: transform 0.4s ease;
-  pointer-events: none;
-}
-
-.bottom-controls-group > * {
-    pointer-events: auto;
 }
 
 .bottom-controls-group.minimized {
@@ -263,27 +254,26 @@ body.capturing .syllable:hover {
 .floating-navigation {
   display: flex;
   gap: 20px;
-  align-items: center; /* Ensure vertical alignment */
-  position: relative; /* Allow absolute positioning of minimize button */
-  transition: transform 0.3s ease; /* Add smooth transition for navigation movement */
-  transform: translateY(25px);
+  align-items: center;
+  position: relative;
+  transition: transform 0.3s ease;
+  transform: translateY(25px); /* Lowered default position */
 }
 
-/* Move navigation arrows down when chord mode is off */
+/* Lowered further when chord mode is off */
 body:not(.chord-mode-active) .floating-navigation {
-  transform: translateY(55px); /* Move down by 55px when chord mode is off */
+  transform: translateY(55px);
 }
 
-/* Position minimize button to the left of navigation arrows */
 .floating-navigation::before {
   content: '';
   position: absolute;
-  left: -50px; /* Position to the left of the navigation */
+  left: -50px; 
   top: 50%;
   transform: translateY(-50%);
   width: 30px;
   height: 30px;
-  pointer-events: none; /* This is just for spacing reference */
+  pointer-events: none;
 }
 
 /* ===== CHORD BOXES ===== */
@@ -299,6 +289,10 @@ body:not(.chord-mode-active) .floating-navigation {
   margin-bottom: 0;
 }
 
+#chordBoxes.show {
+    display: flex;
+}
+
 .chord-boxes.show {
   opacity: 1;
   visibility: visible;
@@ -306,7 +300,6 @@ body:not(.chord-mode-active) .floating-navigation {
   margin-bottom: 10px;
 }
 
-/* Keep chord boxes visible when minimized but chord mode is active */
 .bottom-controls-group.minimized .chord-boxes.show {
   opacity: 1;
   visibility: visible;
@@ -331,10 +324,9 @@ body:not(.chord-mode-active) .floating-navigation {
   user-select: none;
   pointer-events: none;
   line-height: 1;
-  height: 12px; /* Fixed height to prevent layout shift */
+  height: 12px;
 }
 
-/* FIXED: Show chord box numbers when glasses are active */
 .show-names .chord-box-number {
   opacity: 1;
 }
@@ -425,9 +417,9 @@ body:not(.chord-mode-active) .floating-navigation {
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 8px; /* Changed from 50% to 8px for rounded rectangle */
-  width: 40px; /* Made wider for rectangle shape */
-  height: 30px; /* Keep height the same */
+  border-radius: 8px;
+  width: 40px;
+  height: 30px;
   font-size: 12px;
   cursor: pointer;
   display: flex;
@@ -438,7 +430,7 @@ body:not(.chord-mode-active) .floating-navigation {
   font-family: monospace;
   line-height: 1;
   z-index: 160;
-  box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3); /* Match arrow button shadow style */
+  box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
 }
 
 .minimize-btn:hover {
@@ -452,7 +444,7 @@ body:not(.chord-mode-active) .floating-navigation {
 }
 
 .bottom-controls-group.minimized .minimize-btn {
-  background-color: #007bff; /* Blue when minimized */
+  background-color: #007bff;
   box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
 }
 
@@ -460,7 +452,6 @@ body:not(.chord-mode-active) .floating-navigation {
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
 }
 
-/* Hide only the bottom controls when minimized, not the chord boxes */
 .bottom-controls-group.minimized .chord-boxes:not(.show) {
   opacity: 0;
   visibility: hidden;
@@ -477,7 +468,6 @@ body:not(.chord-mode-active) .floating-navigation {
   justify-content: center;
 }
 
-/* Edit-only controls (hidden by default, shown when edit mode is on) */
 .edit-only-controls {
   max-height: 0;
   overflow: hidden;
@@ -487,14 +477,13 @@ body:not(.chord-mode-active) .floating-navigation {
 }
 
 .edit-only-controls.show {
-  max-height: 60px; /* Adjust based on your button heights */
+  max-height: 60px;
   opacity: 1;
   margin-bottom: 10px;
 }
 
-/* Standard controls (always visible) */
 .standard-controls {
-  /* No special styling needed - always visible */
+  /* No special styling needed */
 }
 
 .control-group {
@@ -503,7 +492,6 @@ body:not(.chord-mode-active) .floating-navigation {
   gap: 4px;
 }
 
-/* Hidden checkbox - no styling needed since it's hidden */
 .edit-controls input[type="checkbox"] {
   display: none;
 }
@@ -607,7 +595,15 @@ body:not(.chord-mode-active) .floating-navigation {
   outline: none;
   min-width: 32px;
   height: 32px;
-  font-size: 20px;
+}
+
+#copyVisualBtn {
+    background-color: #6c757d;
+    color: white;
+}
+
+#copyVisualBtn.active, #copyVisualBtn:hover {
+    background-color: #007bff;
 }
 
 .icon-btn .glasses-icon {
@@ -615,13 +611,11 @@ body:not(.chord-mode-active) .floating-navigation {
   color: #007bff;
 }
 
-/* Default state - no special glow */
 .icon-btn:not(.active) .glasses-icon {
   color: #007bff;
   filter: none;
 }
 
-/* Active state - tight green glow directly around glasses */
 .icon-btn.active .glasses-icon {
   color: #007bff;
   filter: drop-shadow(0 0 3px #00ff00) 
@@ -629,7 +623,6 @@ body:not(.chord-mode-active) .floating-navigation {
           drop-shadow(0 0 9px #00ff00);
 }
 
-/* Hover effects */
 .icon-btn:hover {
   background: rgba(240, 248, 255, 0.5);
   transform: scale(1.05);
@@ -639,61 +632,52 @@ body:not(.chord-mode-active) .floating-navigation {
   transform: scale(0.95);
 }
 
-/* Enhanced hover effect when active (slightly brighter tight glow) */
 .icon-btn.active:hover .glasses-icon {
   filter: drop-shadow(0 0 4px #00ff00) 
           drop-shadow(0 0 8px #00ff00) 
           drop-shadow(0 0 12px #00ff00);
 }
 
-/* ===== CONSTRUCTION HAT ICON (Edit Button) ===== */
 .icon-btn .construction-hat-icon {
   transition: all 0.3s ease;
-  color: #6c757d; /* Grey when edit mode is off */
+  color: #6c757d;
 }
 
-/* Edit mode OFF - grey hat */
 .icon-btn:not(.active) .construction-hat-icon {
   color: #6c757d;
   filter: none;
 }
 
-/* Edit mode ON - orange hat with tight glow */
 .icon-btn.active .construction-hat-icon {
-  color: #ff9500; /* Construction orange */
+  color: #ff9500;
   filter: drop-shadow(0 0 3px #ff9500) 
           drop-shadow(0 0 6px #ff9500) 
           drop-shadow(0 0 9px #ff9500);
 }
 
-/* Enhanced hover effect when active */
 .icon-btn.active:hover .construction-hat-icon {
   filter: drop-shadow(0 0 4px #ff9500) 
           drop-shadow(0 0 8px #ff9500) 
           drop-shadow(0 0 12px #ff9500);
 }
 
-/* ===== PIANO KEYS ICON (Chord Button) ===== */
 .icon-btn .piano-keys-icon {
   transition: all 0.3s ease;
-  color: #6c757d; /* Grey when chord mode is off */
+  color: #6c757d;
 }
 
-/* Chord mode OFF - grey piano keys */
 .icon-btn:not(.active) .piano-keys-icon {
   color: #6c757d;
   filter: none;
 }
 
-/* Chord mode ON - purple piano keys with tight glow */
 .icon-btn.active .piano-keys-icon {
-  color: #9f4fff; /* Musical purple */
+  color: #9f4fff;
   filter: drop-shadow(0 0 3px #9f4fff) 
           drop-shadow(0 0 6px #9f4fff) 
           drop-shadow(0 0 9px #9f4fff);
 }
 
-/* Enhanced hover effect when active */
 .icon-btn.active:hover .piano-keys-icon {
   filter: drop-shadow(0 0 4px #9f4fff) 
           drop-shadow(0 0 8px #9f4fff) 
@@ -994,6 +978,14 @@ body:not(.chord-mode-active) .floating-navigation {
   transition: all 0.3s ease;
 }
 
+#newLinePopup {
+    display: none;
+}
+
+#newLinePopup.show {
+    display: flex;
+}
+
 .popup-overlay.show {
   opacity: 1;
   visibility: visible;
@@ -1010,32 +1002,56 @@ body:not(.chord-mode-active) .floating-navigation {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   transform: scale(0.9);
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .popup-overlay.show .popup-content {
   transform: scale(1);
 }
 
-.popup-content h3 {
-  margin-top: 0;
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
+}
+
+.popup-title {
   font-size: 20px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
   color: #333;
 }
 
-.popup-content textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  margin-bottom: 16px;
+.popup-body {
+  flex-grow: 1;
 }
 
-.popup-buttons {
+#newLineText {
+  width: 100%;
+  height: 250px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.popup-footer {
+  margin-top: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1043,19 +1059,17 @@ body:not(.chord-mode-active) .floating-navigation {
 
 .popup-mode-toggle {
   display: flex;
-  background-color: #f0f0f0;
+  border: 1px solid #ccc;
   border-radius: 6px;
   overflow: hidden;
 }
 
 .popup-mode-btn {
-  background: transparent;
-  border: none;
   padding: 8px 12px;
-  font-size: 14px;
+  background-color: #eee;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  color: #555;
+  border: none;
+  transition: background-color 0.2s;
 }
 
 .popup-mode-btn.active {
@@ -1063,52 +1077,32 @@ body:not(.chord-mode-active) .floating-navigation {
   color: white;
 }
 
-.popup-action-buttons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.popup-btn {
+.popup-actions .btn {
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s;
 }
 
-.popup-btn.cancel-btn {
-  background-color: #f0f0f0;
-  color: #555;
-}
-
-.popup-btn.cancel-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.popup-btn.submit-btn {
-  background-color: #28a745;
+.popup-actions .btn-primary {
+  background-color: #007bff;
   color: white;
 }
 
-.popup-btn.submit-btn:hover {
-  background-color: #218838;
+.popup-actions .btn-primary:hover {
+  background-color: #0056b3;
 }
 
-.copy-icon {
-  cursor: pointer;
-  color: #888;
-  transition: color 0.3s ease, transform 0.3s ease;
+.popup-actions .btn-secondary {
+  background-color: #6c757d;
+  color: white;
 }
 
-.copy-icon:hover {
-  color: #007bff;
-  transform: scale(1.1);
+.popup-actions .btn-secondary:hover {
+  background-color: #5a6268;
 }
 
-.copy-icon.copied {
-  color: #28a745;
-  transform: scale(1.2);
+.popup-actions .btn-secondary.copied {
+  background-color: #28a745;
 }
