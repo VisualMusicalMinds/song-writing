@@ -140,7 +140,10 @@ const solfegeKeyMap = {
   'e': 'ti',         // Ti1
   'r': 'do-high',    // Do2
   't': 're-high',    // Re2
-  'y': 'mi-high'     // Mi2
+  'y': 'mi-high',    // Mi2
+  'u': 'fa-high',    // Fa2
+  'i': 'so-high',    // So2
+  'o': 'la-high'     // La2
 };
 
 function transposeNote(noteWithOctave, semitonesUp, octaveShift = 0) {
@@ -205,28 +208,31 @@ const KEY_SIGNATURES_CHROMATIC_INDEX = {
 const noteOrder = [
   'so-low', 'la-low', 'ti-low',
   'do', 're', 'mi', 'fa', 'so', 'la', 'ti',
-  'do-high', 're-high', 'mi-high'
+  'do-high', 're-high', 'mi-high', 'fa-high', 'so-high', 'la-high'
 ];
 
 const noteToSolfege = { 
   'so-low': 'So', 'la-low': 'La', 'ti-low': 'Ti',
   'do': 'Do', 're': 'Re', 'mi': 'Mi', 'fa': 'Fa', 
   'so': 'So', 'la': 'La', 'ti': 'Ti',
-  'do-high': 'Do', 're-high': 'Re', 'mi-high': 'Mi'
+  'do-high': 'Do', 're-high': 'Re', 'mi-high': 'Mi',
+  'fa-high': 'Fa', 'so-high': 'So', 'la-high': 'La'
 };
 
 const noteToShorthandMap = {
     'so-low': 'S-1', 'la-low': 'L-1', 'ti-low': 'T-1',
     'do': 'D1', 're': 'R1', 'mi': 'M1', 'fa': 'F1',
     'so': 'S1', 'la': 'L1', 'ti': 'T1',
-    'do-high': 'D2', 're-high': 'R2', 'mi-high': 'M2'
+    'do-high': 'D2', 're-high': 'R2', 'mi-high': 'M2',
+    'fa-high': 'F2', 'so-high': 'S2', 'la-high': 'L2'
 };
 
 const shorthandToNoteMap = {
     'S-1': 'so-low', 'L-1': 'la-low', 'T-1': 'ti-low',
     'D1': 'do', 'R1': 're', 'M1': 'mi', 'F1': 'fa',
     'S1': 'so', 'L1': 'la', 'T1': 'ti',
-    'D2': 'do-high', 'R2': 're-high', 'M2': 'mi-high'
+    'D2': 'do-high', 'R2': 're-high', 'M2': 'mi-high',
+    'F2': 'fa-high', 'S2': 'so-high', 'L2': 'la-high'
 };
 
 const LINE_COLORS = ['#f5f5f5', '#f0f8ff', '#fff0f5', '#f0fff0'];
