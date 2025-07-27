@@ -2,20 +2,31 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 // ===== COLOR SYSTEM =====
+const colorSchemeRed = { 'Do': '#FF3B30', 'Re': '#FF9500', 'Mi': '#FFCC00', 'Fa': '#34C759', 'So': '#48C4C8', 'La': '#007AFF', 'Ti': '#AF52DE' };
+const colorSchemeOrange = { 'Do': '#FF9500', 'Re': '#FFCC00', 'Mi': '#34C759', 'Fa': '#48C4C8', 'So': '#007AFF', 'La': '#AF52DE', 'Ti': '#FF3B30' };
+const colorSchemeYellow = { 'Do': '#FFCC00', 'Re': '#34C759', 'Mi': '#48C4C8', 'Fa': '#007AFF', 'So': '#AF52DE', 'La': '#FF3B30', 'Ti': '#FF9500' };
+const colorSchemeGreen = { 'Do': '#34C759', 'Re': '#48C4C8', 'Mi': '#007AFF', 'Fa': '#AF52DE', 'So': '#FF3B30', 'La': '#FF9500', 'Ti': '#FFCC00' };
+const colorSchemeTurquoise = { 'Do': '#48C4C8', 'Re': '#007AFF', 'Mi': '#AF52DE', 'Fa': '#FF3B30', 'So': '#FF9500', 'La': '#FFCC00', 'Ti': '#34C759' };
+const colorSchemeBlue = { 'Do': '#007AFF', 'Re': '#AF52DE', 'Mi': '#FF3B30', 'Fa': '#FF9500', 'So': '#FFCC00', 'La': '#34C759', 'Ti': '#48C4C8' };
+const colorSchemePurple = { 'Do': '#AF52DE', 'Re': '#FF3B30', 'Mi': '#FF9500', 'Fa': '#FFCC00', 'So': '#34C759', 'La': '#48C4C8', 'Ti': '#007AFF' };
+
 const noteColorsByKey = {
-  'C': { 'Do': '#FF3B30', 'Re': '#FF9500', 'Mi': '#FFCC00', 'Fa': '#34C759', 'So': '#48C4C8', 'La': '#007AFF', 'Ti': '#AF52DE' },
-  'Db': { 'Do': '#FF9500', 'Re': '#FFCC00', 'Mi': '#34C759', 'Fa': '#48C4C8', 'So': '#007AFF', 'La': '#AF52DE', 'Ti': '#FF3B30' },
-  'D': { 'Do': '#FF9500', 'Re': '#FFCC00', 'Mi': '#34C759', 'Fa': '#48C4C8', 'So': '#007AFF', 'La': '#AF52DE', 'Ti': '#FF3B30' },
-  'Eb': { 'Do': '#FFCC00', 'Re': '#34C759', 'Mi': '#48C4C8', 'Fa': '#007AFF', 'So': '#AF52DE', 'La': '#FF3B30', 'Ti': '#FF9500' },
-  'E': { 'Do': '#FFCC00', 'Re': '#34C759', 'Mi': '#48C4C8', 'Fa': '#007AFF', 'So': '#AF52DE', 'La': '#FF3B30', 'Ti': '#FF9500' },
-  'F': { 'Do': '#34C759', 'Re': '#48C4C8', 'Mi': '#007AFF', 'Fa': '#AF52DE', 'So': '#FF3B30', 'La': '#FF9500', 'Ti': '#FFCC00' },
-  'Gb': { 'Do': '#48C4C8', 'Re': '#007AFF', 'Mi': '#AF52DE', 'Fa': '#FF3B30', 'So': '#FF9500', 'La': '#FFCC00', 'Ti': '#34C759' },
-  'G': { 'Do': '#48C4C8', 'Re': '#007AFF', 'Mi': '#AF52DE', 'Fa': '#FF3B30', 'So': '#FF9500', 'La': '#FFCC00', 'Ti': '#34C759' },
-  'Ab': { 'Do': '#007AFF', 'Re': '#AF52DE', 'Mi': '#FF3B30', 'Fa': '#FF9500', 'So': '#FFCC00', 'La': '#34C759', 'Ti': '#48C4C8' },
-  'A': { 'Do': '#007AFF', 'Re': '#AF52DE', 'Mi': '#FF3B30', 'Fa': '#FF9500', 'So': '#FFCC00', 'La': '#34C759', 'Ti': '#48C4C8' },
-  'Bb': { 'Do': '#AF52DE', 'Re': '#FF3B30', 'Mi': '#FF9500', 'Fa': '#FFCC00', 'So': '#34C759', 'La': '#48C4C8', 'Ti': '#007AFF' },
-  'B': { 'Do': '#AF52DE', 'Re': '#FF3B30', 'Mi': '#FF9500', 'Fa': '#FFCC00', 'So': '#34C759', 'La': '#48C4C8', 'Ti': '#007AFF' }
+  // Red
+  'C': colorSchemeRed, 'C#': colorSchemeRed,
+  // Orange
+  'Db': colorSchemeOrange, 'D': colorSchemeOrange, 'D#': colorSchemeOrange,
+  // Yellow
+  'Eb': colorSchemeYellow, 'E': colorSchemeYellow,
+  // Green
+  'F': colorSchemeGreen, 'F#': colorSchemeGreen,
+  // Turquoise
+  'Gb': colorSchemeTurquoise, 'G': colorSchemeTurquoise, 'G#': colorSchemeTurquoise,
+  // Blue
+  'Ab': colorSchemeBlue, 'A': colorSchemeBlue, 'A#': colorSchemeBlue,
+  // Purple
+  'Bb': colorSchemePurple, 'B': colorSchemePurple,
 };
+
 
 const letterNamesByKey = {
   'C': { 'Do': 'C', 'Re': 'D', 'Mi': 'E', 'Fa': 'F', 'So': 'G', 'La': 'A', 'Ti': 'B' },
@@ -29,7 +40,13 @@ const letterNamesByKey = {
   'Ab': { 'Do': 'Ab', 'Re': 'Bb', 'Mi': 'C', 'Fa': 'Db', 'So': 'Eb', 'La': 'F', 'Ti': 'G' },
   'A': { 'Do': 'A', 'Re': 'B', 'Mi': 'C#', 'Fa': 'D', 'So': 'E', 'La': 'F#', 'Ti': 'G#' },
   'Bb': { 'Do': 'Bb', 'Re': 'C', 'Mi': 'D', 'Fa': 'Eb', 'So': 'F', 'La': 'G', 'Ti': 'A' },
-  'B': { 'Do': 'B', 'Re': 'C#', 'Mi': 'D#', 'Fa': 'E', 'So': 'F#', 'La': 'G#', 'Ti': 'A#' }
+  'B': { 'Do': 'B', 'Re': 'C#', 'Mi': 'D#', 'Fa': 'E', 'So': 'F#', 'La': 'G#', 'Ti': 'A#' },
+  // Enharmonic Sharp Keys
+  'C#': { 'Do': 'C#', 'Re': 'D#', 'Mi': 'E#', 'Fa': 'F#', 'So': 'G#', 'La': 'A#', 'Ti': 'B#' },
+  'D#': { 'Do': 'D#', 'Re': 'E#', 'Mi': 'F##', 'Fa': 'G#', 'So': 'A#', 'La': 'B#', 'Ti': 'C##' },
+  'F#': { 'Do': 'F#', 'Re': 'G#', 'Mi': 'A#', 'Fa': 'B', 'So': 'C#', 'La': 'D#', 'Ti': 'E#' },
+  'G#': { 'Do': 'G#', 'Re': 'A#', 'Mi': 'B#', 'Fa': 'C#', 'So': 'D#', 'La': 'E#', 'Ti': 'F##' },
+  'A#': { 'Do': 'A#', 'Re': 'B#', 'Mi': 'C##', 'Fa': 'D#', 'So': 'E#', 'La': 'F##', 'Ti': 'G##' },
 };
 
 // ===== CHORD COLOR MAPPING =====
@@ -97,10 +114,16 @@ const KEY_TRANSPOSITION = {
   'F': { semitones: 5, octaveShift: 0 },
   'Gb': { semitones: 6, octaveShift: 0 },
   'G': { semitones: 7, octaveShift: 0 },
-  'Ab': { semitones: 8, octaveShift: -1 },
+  'Ab': { semitones: 8, octaveShift: -1 }, // Lowest
   'A': { semitones: 9, octaveShift: -1 },
   'Bb': { semitones: 10, octaveShift: -1 },
-  'B': { semitones: 11, octaveShift: -1 }
+  'B': { semitones: 11, octaveShift: -1 },
+  // Enharmonic Sharp Keys
+  'C#': { semitones: 1, octaveShift: 0 },
+  'D#': { semitones: 3, octaveShift: 0 },
+  'F#': { semitones: 6, octaveShift: 0 },
+  'G#': { semitones: 8, octaveShift: 0 }, // Kept high
+  'A#': { semitones: 10, octaveShift: -1 },
 };
 
 // ===== SOLFEGE KEYBOARD MAPPING =====
@@ -175,7 +198,8 @@ const SOLFEGE_INTERVALS = {
 const DEFAULT_SOLFEGE_OCTAVE = 4; 
 
 const KEY_SIGNATURES_CHROMATIC_INDEX = {
-    'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11
+    'C': 0, 'Db': 1, 'D': 2, 'Eb': 3, 'E': 4, 'F': 5, 'Gb': 6, 'G': 7, 'Ab': 8, 'A': 9, 'Bb': 10, 'B': 11,
+    'C#': 1, 'D#': 3, 'F#': 6, 'G#': 8, 'A#': 10
 };
 
 const noteOrder = [
@@ -232,6 +256,7 @@ const chordBoxes = document.getElementById('chordBoxes');
 const popupModeToggle = document.querySelector('.popup-mode-toggle');
 const copyLyricsBtn = document.getElementById('copyLyricsBtn');
 const enterKeyBtn = document.getElementById('enterKeyBtn');
+const copyVisualBtn = document.getElementById('copyVisualBtn');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
@@ -287,7 +312,115 @@ function isPopupOpen() {
   return newLinePopup.classList.contains('show');
 }
 
-// ===== LINE BACKGROUNDS =====
+// ===== VISUAL CAPTURE FUNCTIONS =====
+async function copyCanvasToClipboard(canvas) {
+    try {
+        return new Promise(resolve => {
+            canvas.toBlob(async (blob) => {
+                try {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    resolve(true);
+                } catch (err) {
+                    console.error('Failed to copy image to clipboard:', err);
+                    resolve(false);
+                }
+            }, 'image/png');
+        });
+    } catch (err) {
+        console.error('Clipboard API not supported:', err);
+        return false;
+    }
+}
+
+async function captureVisual() {
+    const originalText = copyVisualBtn.innerHTML;
+    try {
+        document.body.classList.add('capturing');
+        copyVisualBtn.innerHTML = '⏳';
+        copyVisualBtn.style.backgroundColor = '#ffc107';
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const notationContainer = document.querySelector('.notation-container');
+        const canvas = await html2canvas(notationContainer, {
+            backgroundColor: '#fafafa',
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            scrollX: 0,
+            scrollY: -window.scrollY 
+        });
+        
+        const success = await copyCanvasToClipboard(canvas);
+        
+        if (success) {
+            copyVisualBtn.innerHTML = '✓';
+            copyVisualBtn.style.backgroundColor = '#28a745';
+        } else {
+            const link = document.createElement('a');
+            link.download = 'notation-capture.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            copyVisualBtn.innerHTML = '💾';
+            copyVisualBtn.style.backgroundColor = '#17a2b8';
+        }
+    } catch (error) {
+        console.error('Failed to capture visual:', error);
+        copyVisualBtn.innerHTML = '✗';
+        copyVisualBtn.style.backgroundColor = '#dc3545';
+    } finally {
+        document.body.classList.remove('capturing');
+        setTimeout(() => {
+            copyVisualBtn.innerHTML = originalText;
+            copyVisualBtn.style.backgroundColor = '';
+        }, 2000);
+    }
+}
+
+
+// ===== LINE BACKGROUNDS & HEIGHTS =====
+function updateLineHeight(line) {
+    if (!line) return;
+    const notesInLine = line.querySelectorAll('.note');
+    
+    if (notesInLine.length === 0) {
+        if (line.classList.contains('section-break')) {
+             line.style.minHeight = '60px';
+        } else {
+             line.style.minHeight = '';
+        }
+        return;
+    }
+
+    let maxNoteIndex = -1;
+    notesInLine.forEach(noteElement => {
+        const noteClass = noteOrder.find(cls => noteElement.classList.contains(cls));
+        if (noteClass) {
+            const index = noteOrder.indexOf(noteClass);
+            if (index > maxNoteIndex) {
+                maxNoteIndex = index;
+            }
+        }
+    });
+
+    let minHeight = '130px'; 
+    if (maxNoteIndex < 0) {
+         minHeight = '80px';
+    } else if (maxNoteIndex <= 6) { // Up to 'fa'
+         minHeight = '90px';
+    } else if (maxNoteIndex <= 10) { // Up to 'ti'
+         minHeight = '110px';
+    }
+
+    line.style.minHeight = minHeight;
+}
+
+function updateAllLineHeights() {
+    document.querySelectorAll('.notation-line').forEach(updateLineHeight);
+}
+
 function updateLineBackgrounds() {
     const lines = document.querySelectorAll('.notation-line');
     lines.forEach((line, index) => {
@@ -319,6 +452,7 @@ function handleSolfegeKeyInput(key) {
     updateNoteDisplay(noteElement, noteClass);
     const frequency = getFrequencyForNote(noteClass);
     if (frequency !== null) playNote(frequency);
+    updateLineHeight(currentSyllable.closest('.notation-line'));
     return true;
   }
   return false;
@@ -438,7 +572,10 @@ function calculateFrequency(key, solfegeWithOctave, accidental = 'natural') {
   let accidentalOffset = 0;
   if (accidental === 'sharp') accidentalOffset = 1;
   else if (accidental === 'flat') accidentalOffset = -1;
-  const tonicNoteInDefaultOctaveSemitonesFromC0 = tonicChromaticIndex + DEFAULT_SOLFEGE_OCTAVE * SEMITONES_IN_OCTAVE;
+  
+  const keyOctaveShift = KEY_TRANSPOSITION[key] ? (KEY_TRANSPOSITION[key].octaveShift || 0) : 0;
+  
+  const tonicNoteInDefaultOctaveSemitonesFromC0 = tonicChromaticIndex + (DEFAULT_SOLFEGE_OCTAVE + keyOctaveShift) * SEMITONES_IN_OCTAVE;
   const targetNoteSemitonesFromC0 = tonicNoteInDefaultOctaveSemitonesFromC0 + solfegeInterval + accidentalOffset + (octaveShift * SEMITONES_IN_OCTAVE);
   const frequency = C0_HZ * Math.pow(2, targetNoteSemitonesFromC0 / SEMITONES_IN_OCTAVE);
   if (isNaN(frequency)) return null;
@@ -672,6 +809,7 @@ function createNewLineFromText(text, mode = 'add') {
     });
 
     updateLineBackgrounds();
+    updateAllLineHeights();
 
     if (lastCreatedSyllable) {
         setSyllableAsActive(lastCreatedSyllable);
@@ -697,6 +835,7 @@ function addSyllableAfterCurrent() {
         targetLine = createNewLineElement();
         document.querySelector('.notation-container').appendChild(targetLine);
         updateLineBackgrounds();
+        updateLineHeight(targetLine);
     }
   }
   if (!targetLine) { console.warn("Target line not found for adding syllable."); return; }
@@ -704,6 +843,7 @@ function addSyllableAfterCurrent() {
   if (targetSyllable) targetSyllable.insertAdjacentElement('afterend', newSyllable);
   else targetLine.appendChild(newSyllable);
   addSyllableEventListeners(newSyllable);
+  updateLineHeight(targetLine);
   setSyllableAsActive(newSyllable); 
   return newSyllable;
 }
@@ -721,6 +861,8 @@ function deleteSyllable() {
   if (parentLine && parentLine.querySelectorAll('.syllable').length === 0) {
       parentLine.remove();
       updateLineBackgrounds();
+  } else if (parentLine) {
+      updateLineHeight(parentLine);
   }
 
   const remainingSyllables = getAllSyllables();
@@ -953,27 +1095,47 @@ function updateEnterKeyButtonState() {
     }
 }
 function changeKey(newKey) {
-  if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
-    currentKey = newKey; 
-    applyNoteColors(); 
-    applyChordColors();
-    updateChordBoxLabels();
-    console.log(`Key changed to: ${newKey}`);
-    resetAccidentalToggleVisuals();
-  } else console.warn(`Attempted to change to invalid key: ${newKey}`);
+    if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
+        currentKey = newKey;
+
+        const existingTempOption = keySelector.querySelector('[data-temporary="true"]');
+        if (existingTempOption) {
+            existingTempOption.remove();
+        }
+
+        const isStandardKey = [...keySelector.options].some(option => option.value === newKey);
+
+        if (!isStandardKey) {
+            const tempOption = document.createElement('option');
+            tempOption.value = newKey;
+            tempOption.textContent = newKey;
+            tempOption.dataset.temporary = "true";
+            keySelector.insertBefore(tempOption, keySelector.firstChild);
+        }
+
+        keySelector.value = newKey;
+        
+        applyNoteColors();
+        applyChordColors();
+        updateChordBoxLabels();
+        console.log(`Key changed to: ${newKey}`);
+        resetAccidentalToggleVisuals();
+    } else {
+        console.warn(`Attempted to change to invalid key: ${newKey}`);
+    }
 }
 
 // ===== NEW LINE POPUP FUNCTIONS =====
 function showNewLinePopup() {
     if (!editModeCheckbox.checked) return;
 
-    let fullText = '';
+    let bodyText = '';
     const lines = document.querySelectorAll('.notation-line');
 
     lines.forEach(line => {
         const labelInput = line.querySelector('.line-label');
         const label = labelInput.value.trim();
-        fullText += `[${label || 'New Line'}]\n`;
+        bodyText += `[${label || 'New Line'}]\n`;
 
         const syllables = line.querySelectorAll('.syllable');
         const formattedSyllables = Array.from(syllables).map(syllable => {
@@ -992,11 +1154,13 @@ function showNewLinePopup() {
             return `${text}[${shorthand}]`;
         }).join(' ');
         
-        fullText += formattedSyllables + '\n';
+        bodyText += formattedSyllables + '\n';
     });
 
+    const fullText = `[Key of ${currentKey}]\n` + bodyText.trim();
+
     newLinePopup.classList.add('show');
-    newLineText.value = fullText.trim();
+    newLineText.value = fullText;
     newLineText.focus();
     newLineText.select();
 
@@ -1011,7 +1175,31 @@ function hideNewLinePopup() {
 }
 
 function handleNewLineSubmit() {
-    const text = newLineText.value;
+    let text = newLineText.value;
+    let finalKey = currentKey;
+
+    // Check for a key tag
+    const keyMatch = text.match(/^\[Key of (.*?)\]\n?/);
+    if (keyMatch) {
+        const potentialKey = keyMatch[1];
+        // Use the new KEY_SIGNATURES_CHROMATIC_INDEX which includes sharp keys
+        if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(potentialKey)) {
+            finalKey = potentialKey;
+        }
+        // Remove the key tag from the text to be processed
+        text = text.substring(keyMatch[0].length);
+    }
+
+    // Update the app's key if it changed
+    if (finalKey !== currentKey) {
+        changeKey(finalKey);
+    }
+
+    // Ensure the text has a section tag if it's not empty
+    if (text.trim() && !text.trim().startsWith('[')) {
+        text = '[New Line]\n' + text;
+    }
+    
     createNewLineFromText(text, newLineMode);
     hideNewLinePopup();
 }
@@ -1031,6 +1219,7 @@ function changeNote(noteElement, direction = 'up', playSound = true) {
     const frequency = getFrequencyForNote(nextNote); 
     if (frequency !== null) playNote(frequency);
   }
+  updateLineHeight(noteElement.closest('.notation-line'));
 }
 
 // ===== NAVIGATION FUNCTIONS =====
@@ -1198,6 +1387,8 @@ function handleEnterKeyClick() {
                 
                 currentLine.after(newNotationLine);
                 updateLineBackgrounds();
+                updateLineHeight(currentLine);
+                updateLineHeight(newNotationLine);
                 setSyllableAsActive(newNotationLine.querySelector('.syllable'));
             }
             break;
@@ -1220,6 +1411,7 @@ document.addEventListener('DOMContentLoaded', () => {
   showNames = false;
   
   updateLineBackgrounds();
+  updateAllLineHeights();
   applyNoteColors(); 
   applyChordColors();
   updateChordBoxLabels();
@@ -1260,6 +1452,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Failed to copy lyrics: ', err);
     });
   });
+
+  if (copyVisualBtn) {
+    copyVisualBtn.addEventListener('click', captureVisual);
+  }
 });
 
 // ===== EVENT LISTENERS =====
