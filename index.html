@@ -170,6 +170,17 @@
 
         <!-- Control Panel -->
         <div class="bottom-controls">
+            <!-- Upload-Only Controls Row (Hidden by default) -->
+            <div class="edit-controls upload-controls" id="uploadControls">
+                <div class="control-group">
+                    <select class="key-selector" id="preloadedSongsSelector">
+                        <option value="">Preloaded Songs</option>
+                        <option value="twinkle">Twinkle Twinkle</option>
+                        <option value="mary">Mary Had a Little Lamb</option>
+                    </select>
+                </div>
+            </div>
+
             <!-- Edit-Only Controls Row (Hidden by default) -->
             <div class="edit-controls edit-only-controls" id="editOnlyControls">
                 <!-- New Line Button -->
@@ -289,6 +300,17 @@
                 <div class="control-group">
                     <button class="icon-btn" id="copyVisualBtn" title="Copy visual">📷</button>
                 </div>
+
+                <!-- Upload Button -->
+                <div class="control-group">
+                    <button class="icon-btn" id="uploadBtn" title="Upload songs">
+                        <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Hints Section -->
@@ -326,6 +348,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="songs.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
