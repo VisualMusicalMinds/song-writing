@@ -6,6 +6,17 @@ body {
   background-color: #fafafa;
 }
 
+/* Styles for capturing (temporarily hide interactive elements) */
+body.capturing .syllable.highlighted {
+    background-color: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+body.capturing .syllable:hover {
+    background-color: transparent !important;
+}
+
 .main-container {
   display: flex;
   flex-direction: column;
@@ -19,7 +30,7 @@ body {
 .notation-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
   width: 100%;
   align-items: center;
 }
@@ -43,7 +54,7 @@ body {
 }
 
 .notation-line.section-break {
-    margin-top: 40px;
+    margin-top: 0;
 }
 
 /* ===== LINE LABEL ===== */
@@ -238,6 +249,11 @@ body {
   gap: 15px;
   z-index: 150;
   transition: transform 0.4s ease;
+  pointer-events: none;
+}
+
+.bottom-controls-group > * {
+    pointer-events: auto;
 }
 
 .bottom-controls-group.minimized {
@@ -250,11 +266,12 @@ body {
   align-items: center; /* Ensure vertical alignment */
   position: relative; /* Allow absolute positioning of minimize button */
   transition: transform 0.3s ease; /* Add smooth transition for navigation movement */
+  transform: translateY(25px);
 }
 
 /* Move navigation arrows down when chord mode is off */
 body:not(.chord-mode-active) .floating-navigation {
-  transform: translateY(30px); /* Move down by 30px when chord mode is off */
+  transform: translateY(55px); /* Move down by 55px when chord mode is off */
 }
 
 /* Position minimize button to the left of navigation arrows */
@@ -590,6 +607,7 @@ body:not(.chord-mode-active) .floating-navigation {
   outline: none;
   min-width: 32px;
   height: 32px;
+  font-size: 20px;
 }
 
 .icon-btn .glasses-icon {
@@ -999,97 +1017,45 @@ body:not(.chord-mode-active) .floating-navigation {
 }
 
 .popup-content h3 {
-  margin: 0 0 16px 0;
-  color: #333;
+  margin-top: 0;
+  margin-bottom: 16px;
   font-size: 20px;
-  font-weight: 600;
+  color: #333;
 }
 
 .popup-content textarea {
   width: 100%;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  resize: vertical;
-  min-height: 120px;
-  outline: none;
-  transition: border-color 0.3s ease;
   box-sizing: border-box;
-}
-
-.popup-content textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 16px;
 }
 
 .popup-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
-}
-
-.popup-action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.popup-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 80px;
-}
-
-.cancel-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.cancel-btn:hover {
-  background-color: #5a6268;
-}
-
-.submit-btn {
-  background-color: #007bff;
-  color: white;
-}
-
-.submit-btn:hover {
-  background-color: #0056b3;
-}
-
-.popup-btn:active {
-  transform: scale(0.98);
 }
 
 .popup-mode-toggle {
   display: flex;
-  border: 1px solid #dee2e6;
+  background-color: #f0f0f0;
   border-radius: 6px;
   overflow: hidden;
 }
 
 .popup-mode-btn {
-  padding: 10px 16px;
+  background: transparent;
   border: none;
-  background-color: transparent;
-  color: #495057;
+  padding: 8px 12px;
   font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.popup-mode-btn:first-child {
-  border-right: 1px solid #dee2e6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: #555;
 }
 
 .popup-mode-btn.active {
@@ -1097,66 +1063,52 @@ body:not(.chord-mode-active) .floating-navigation {
   color: white;
 }
 
-.popup-mode-btn:not(.active):hover {
-  background-color: #e9ecef;
+.popup-action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.popup-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.popup-btn.cancel-btn {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.popup-btn.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.popup-btn.submit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.popup-btn.submit-btn:hover {
+  background-color: #218838;
 }
 
 .copy-icon {
-    color: #007bff;
-    cursor: pointer;
-    transition: color 0.2s ease, transform 0.2s ease, stroke-width 0.2s ease;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .copy-icon:hover {
-    transform: scale(1.1);
+  color: #007bff;
+  transform: scale(1.1);
 }
 
 .copy-icon.copied {
-    color: #28a745;
-    stroke-width: 2.5;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-html {
-  scroll-behavior: smooth;
-}
-
-@media (max-width: 768px) {
-  /* Move navigation arrows down more on mobile when chord mode is off */
-  body:not(.chord-mode-active) .floating-navigation {
-    transform: translateY(25px); /* Slightly less movement on mobile */
-  }
-
-  .text { font-size: 16px; }
-  .text-input { font-size: 16px; }
-  .note { width: 28px; }
-  .syllable { min-width: 36px; scroll-margin: 80px; }
-  .arrow-btn { width: 45px; height: 45px; font-size: 18px; }
-  .floating-navigation { gap: 15px; }
-  .bottom-controls { padding: 12px 15px; min-width: 180px; }
-  .bottom-controls-group { gap: 12px; }
-  .info-icon { width: 16px; height: 16px; font-size: 11px; }
-  .key-selector { padding: 4px; font-size: 12px; min-width: 40px; }
-  .accidental-option { padding: 4px; min-width: 16px; }
-  .add-btn, .delete-btn, .new-line-btn, .enter-key-btn { min-width: 28px; height: 28px; font-size: 16px; }
-
-  .popup-content {
-    min-width: 0;
-    width: 95%;
-    padding: 16px;
-  }
-
-  .popup-buttons {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-  }
-
-  .popup-mode-toggle {
-    justify-content: center;
-  }
-
-  .popup-action-buttons {
-    justify-content: flex-end;
-  }
+  color: #28a745;
+  transform: scale(1.2);
 }
