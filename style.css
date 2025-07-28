@@ -474,7 +474,8 @@ body:not(.chord-mode-active) .floating-navigation {
   justify-content: center;
 }
 
-.edit-only-controls {
+.edit-only-controls,
+.upload-controls {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -482,7 +483,8 @@ body:not(.chord-mode-active) .floating-navigation {
   margin-bottom: 0;
 }
 
-.edit-only-controls.show {
+.edit-only-controls.show,
+.upload-controls.show {
   max-height: 60px;
   opacity: 1;
   margin-bottom: 10px;
@@ -688,6 +690,29 @@ body:not(.chord-mode-active) .floating-navigation {
   filter: drop-shadow(0 0 4px #9f4fff) 
           drop-shadow(0 0 8px #9f4fff) 
           drop-shadow(0 0 12px #9f4fff);
+}
+
+.icon-btn .upload-icon {
+  transition: all 0.3s ease;
+  color: #6c757d;
+}
+
+.icon-btn:not(.active) .upload-icon {
+  color: #6c757d;
+  filter: none;
+}
+
+.icon-btn.active .upload-icon {
+  color: #007bff;
+  filter: drop-shadow(0 0 3px #007bff) 
+          drop-shadow(0 0 6px #007bff) 
+          drop-shadow(0 0 9px #007bff);
+}
+
+.icon-btn.active:hover .upload-icon {
+  filter: drop-shadow(0 0 4px #007bff) 
+          drop-shadow(0 0 8px #007bff) 
+          drop-shadow(0 0 12px #007bff);
 }
 
 /* ===== ADD SYLLABLE BUTTON ===== */
