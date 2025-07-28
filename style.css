@@ -692,24 +692,24 @@ body:not(.chord-mode-active) .floating-navigation {
           drop-shadow(0 0 12px #9f4fff);
 }
 
-.icon-btn .upload-icon {
+.icon-btn .save-icon {
   transition: all 0.3s ease;
   color: #6c757d;
 }
 
-.icon-btn:not(.active) .upload-icon {
+.icon-btn:not(.active) .save-icon {
   color: #6c757d;
   filter: none;
 }
 
-.icon-btn.active .upload-icon {
+.icon-btn.active .save-icon {
   color: #007bff;
   filter: drop-shadow(0 0 3px #007bff) 
           drop-shadow(0 0 6px #007bff) 
           drop-shadow(0 0 9px #007bff);
 }
 
-.icon-btn.active:hover .upload-icon {
+.icon-btn.active:hover .save-icon {
   filter: drop-shadow(0 0 4px #007bff) 
           drop-shadow(0 0 8px #007bff) 
           drop-shadow(0 0 12px #007bff);
@@ -999,22 +999,14 @@ body:not(.chord-mode-active) .floating-navigation {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 200;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-#newLinePopup {
-    display: none;
-}
-
-#newLinePopup.show {
-    display: flex;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .popup-overlay.show {
@@ -1022,23 +1014,18 @@ body:not(.chord-mode-active) .floating-navigation {
   visibility: visible;
 }
 
-.popup-mode-toggle {
-  display: none;
-}
-
 .popup-content {
-  background: white;
+  background: #fff;
+  padding: 25px;
   border-radius: 12px;
-  padding: 24px;
-  min-width: 400px;
-  max-width: 600px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   width: 90%;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  transform: scale(0.95);
-  transition: transform 0.3s ease;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 15px;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
 }
 
 .popup-overlay.show .popup-content {
@@ -1047,87 +1034,83 @@ body:not(.chord-mode-active) .floating-navigation {
 
 .popup-content h3 {
   margin: 0;
-  text-align: center;
-  color: #333;
   font-size: 20px;
+  color: #333;
+  text-align: center;
 }
 
 #newLineText {
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-radius: 6px;
   font-size: 14px;
+  font-family: monospace;
   resize: vertical;
   box-sizing: border-box;
-  min-height: 120px;
-}
-
-#newLineText:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .popup-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.popup-mode-toggle {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .popup-mode-btn {
+  background: #f8f9fa;
+  border: none;
   padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #f8f9fa;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.3s ease;
   font-size: 14px;
 }
 
+.popup-mode-btn:first-child {
+  border-right: 1px solid #ccc;
+}
+
 .popup-mode-btn.active {
-  background-color: #007bff;
+  background: #007bff;
   color: white;
-  border-color: #007bff;
 }
 
 .popup-action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
 .copy-icon {
-  cursor: pointer;
-  color: #6c757d;
-  transition: all 0.2s ease;
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.3s, transform 0.3s;
 }
 
 .copy-icon:hover {
-  color: #007bff;
-  transform: scale(1.1);
+    color: #007bff;
+    transform: scale(1.1);
 }
 
 .copy-icon.copied {
     color: #28a745;
-    animation: bounce 0.5s ease;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
 }
 
 .popup-btn {
-  padding: 10px 16px;
-  border-radius: 6px;
   border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .cancel-btn {
