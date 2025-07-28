@@ -14,7 +14,7 @@ Ma[M1] ry[R1] had[D1] a[R1] lit[M1] tle[M1] lamb,[M1] its[M1] fleece[R1] was[R1]
 
    'starspangledbanner': `[Key of Ab]
 [A1]
-Oh,[S1] -[M1] say[D1] can[M1] you[S1] see[D2] By[M2] the[R2] dawn's[D2] ear-[M1] -ly[F#1] light?[S1]
+Oh[S1] -[M1] say[D1] can[M1] you[S1] see[D2] By[M2] the[R2] dawn's[D2] ear-[M1] -ly[F#1] light?[S1]
 [A2]
 What[S1] so[S1] proud-[M2] -ly[R2] we[D2] hailed[T1] At[L1] the[T1] twi-[D2] lights[D2] last[S1] gleam-[M1] ing[D1]
 [A1]
