@@ -191,7 +191,7 @@ let showNames = false;
 let accidentalMode = 'natural'; 
 let chordMode = false;
 let selectedChord = null;
-let uploadMode = false;
+let saveLoadMode = false;
 
 const A4_HZ = 440.0;
 const SEMITONES_IN_OCTAVE = 12;
@@ -266,7 +266,7 @@ const popupModeToggle = document.querySelector('.popup-mode-toggle');
 const copyLyricsBtn = document.getElementById('copyLyricsBtn');
 const enterKeyBtn = document.getElementById('enterKeyBtn');
 const copyVisualBtn = document.getElementById('copyVisualBtn');
-const uploadBtn = document.getElementById('uploadBtn');
+const saveLoadBtn = document.getElementById('saveLoadBtn');
 const uploadControls = document.getElementById('uploadControls');
 const preloadedSongsSelector = document.getElementById('preloadedSongsSelector');
 
@@ -1076,10 +1076,10 @@ function toggleEditMode() {
   updateNewLineButtonState();
   updateEnterKeyButtonState();
 }
-function toggleUploadMode() {
-    uploadMode = !uploadMode;
-    uploadBtn.classList.toggle('active', uploadMode);
-    uploadControls.classList.toggle('show', uploadMode);
+function toggleSaveLoadMode() {
+    saveLoadMode = !saveLoadMode;
+    saveLoadBtn.classList.toggle('active', saveLoadMode);
+    uploadControls.classList.toggle('show', saveLoadMode);
 }
 function syncEditButtonState() { editToggleBtn.classList.toggle('active', editModeCheckbox.checked); }
 function toggleNames() {
@@ -1446,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', () => {
   chordMode = false;
   selectedChord = null;
   showNames = false;
-  uploadMode = false;
+  saveLoadMode = false;
   
   applyNoteColors(); 
   applyChordColors();
@@ -1460,7 +1460,7 @@ document.addEventListener('DOMContentLoaded', () => {
   syncEditButtonState();
   
   uploadControls.classList.remove('show');
-  uploadBtn.classList.remove('active');
+  saveLoadBtn.classList.remove('active');
   
   if (keySelector) keySelector.value = currentKey;
   document.body.setAttribute('tabindex', '0');
@@ -1513,7 +1513,7 @@ newLineBtn.addEventListener('click', showNewLinePopup);
 deleteBtn.addEventListener('click', handleDeleteClick);
 enterKeyBtn.addEventListener('click', handleEnterKeyClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
-uploadBtn.addEventListener('click', toggleUploadMode);
+saveLoadBtn.addEventListener('click', toggleSaveLoadMode);
 
 preloadedSongsSelector.addEventListener('change', (event) => {
     const songKey = event.target.value;
