@@ -306,7 +306,7 @@ function scrollToSyllable(syllable) {
 
     // Calculate the desired scroll position to place the bottom of the syllable
     // at 60% of the viewport height. This creates a stable anchor point.
-    const targetScrollY = syllableBottom - (viewportHeight * 0.6);
+    const targetScrollY = syllableBottom - (viewportHeight * 0.48);
 
     window.scrollTo({
       top: targetScrollY,
