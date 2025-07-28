@@ -1519,6 +1519,7 @@ preloadedSongsSelector.addEventListener('change', (event) => {
     const songKey = event.target.value;
     if (songKey) {
         loadPreloadedSong(songKey);
+        event.target.value = ''; // Reset dropdown after selection
     }
 });
 
