@@ -231,22 +231,24 @@
 
             <!-- Standard Controls Row (Always visible) -->
             <div class="edit-controls standard-controls">
-                <!-- Key Selector Dropdown -->
-                <div class="control-group">
-                    <select class="key-selector" id="keySelector">
-                        <option value="C">C</option>
-                        <option value="Db">D♭</option>
-                        <option value="D">D</option>
-                        <option value="Eb">E♭</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                        <option value="Gb">G♭</option>
-                        <option value="G">G</option>
-                        <option value="Ab">A♭</option>
-                        <option value="A">A</option>
-                        <option value="Bb">B♭</option>
-                        <option value="B">B</option>
-                    </select>
+                <!-- Key Selector Custom Component -->
+                <div class="control-group key-signature-group">
+                    <div class="key-signature-display" id="keySignatureDisplay">C</div>
+                    <div class="key-signature-popup" id="keySignaturePopup">
+                        <div class="key-option" data-key="C">C</div>
+                        <div class="key-option" data-key="Db">D♭</div>
+                        <div class="key-option" data-key="D">D</div>
+                        <div class="key-option" data-key="Eb">E♭</div>
+                        <div class="key-option" data-key="E">E</div>
+                        <div class="key-option" data-key="F">F</div>
+                        <div class="key-option" data-key="F#">F♯</div>
+                        <div class="key-option" data-key="Gb">G♭</div>
+                        <div class="key-option" data-key="G">G</div>
+                        <div class="key-option" data-key="Ab">A♭</div>
+                        <div class="key-option" data-key="A">A</div>
+                        <div class="key-option" data-key="Bb">B♭</div>
+                        <div class="key-option" data-key="B">B</div>
+                    </div>
                 </div>
 
                 <!-- Chord Toggle Button -->
