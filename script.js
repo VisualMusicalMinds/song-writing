@@ -27,6 +27,16 @@ const noteColorsByKey = {
   'Bb': colorSchemePurple, 'B': colorSchemePurple,
 };
 
+const keySignatureColors = {
+    'C': '#FF3B30', 'C#': '#FF3B30',
+    'Db': '#FF9500', 'D': '#FF9500', 'D#': '#FF9500',
+    'Eb': '#FFCC00', 'E': '#FFCC00',
+    'F': '#34C759', 'F#': '#34C759',
+    'Gb': '#48C4C8', 'G': '#48C4C8', 'G#': '#48C4C8',
+    'Ab': '#007AFF', 'A': '#007AFF', 'A#': '#007AFF',
+    'Bb': '#AF52DE', 'B': '#AF52DE'
+};
+
 
 const letterNamesByKey = {
   'C': { 'Do': 'C', 'Re': 'D', 'Mi': 'E', 'Fa': 'F', 'So': 'G', 'La': 'A', 'Ti': 'B' },
@@ -1126,8 +1136,16 @@ function updateEnterKeyButtonState() {
 function changeKey(newKey) {
     if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
         currentKey = newKey;
-        keySignatureDisplay.textContent = newKey;
         
+        // Update display text and color
+        const displayKey = newKey.includes('b') ? newKey.replace('b', '♭') : newKey;
+        keySignatureDisplay.textContent = displayKey;
+        const color = keySignatureColors[newKey];
+        if (color) {
+            keySignatureDisplay.style.borderColor = color;
+            keySignatureDisplay.style.color = color;
+        }
+
         applyNoteColors();
         applyChordColors();
         updateChordBoxLabels();
@@ -1444,7 +1462,7 @@ document.addEventListener('DOMContentLoaded', () => {
   uploadControls.classList.remove('show');
   saveLoadBtn.classList.remove('active');
   
-  keySignatureDisplay.textContent = currentKey;
+  changeKey(currentKey); // Set initial key display and color
   document.body.setAttribute('tabindex', '0');
   
   // Load default song
@@ -1500,6 +1518,16 @@ saveLoadBtn.addEventListener('click', toggleSaveLoadMode);
 keySignatureDisplay.addEventListener('click', () => {
     keySignaturePopup.classList.toggle('show');
     keySignatureDisplay.classList.toggle('active');
+});
+
+keySignaturePopup.addEventListener('click', (event) => {
+    const keyOption = event.target.closest('.key-option');
+    if (keyOption) {
+        const newKey = keyOption.getAttribute('data-key');
+        changeKey(newKey);
+        keySignaturePopup.classList.remove('show');
+        keySignatureDisplay.classList.remove('active');
+    }
 });
 
 preloadedSongsSelector.addEventListener('change', (event) => {
