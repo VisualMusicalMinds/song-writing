@@ -254,7 +254,8 @@ const addBtn = document.getElementById('addBtn');
 const newLineBtn = document.getElementById('newLineBtn');
 const deleteBtn = document.getElementById('deleteBtn');
 const accidentalToggle = document.getElementById('accidentalToggle');
-const keySelector = document.getElementById('keySelector');
+const keySignatureDisplay = document.getElementById('keySignatureDisplay');
+const keySignaturePopup = document.getElementById('keySignaturePopup');
 const newLinePopup = document.getElementById('newLinePopup');
 const newLineText = document.getElementById('newLineText');
 const cancelNewLine = document.getElementById('cancelNewLine');
@@ -333,7 +334,7 @@ function resetEnterKeyState() {
 }
 
 function isPopupOpen() {
-  return newLinePopup.classList.contains('show');
+  return newLinePopup.classList.contains('show') || keySignaturePopup.classList.contains('show');
 }
 
 // ===== VISUAL CAPTURE FUNCTIONS =====
@@ -1125,23 +1126,7 @@ function updateEnterKeyButtonState() {
 function changeKey(newKey) {
     if (KEY_SIGNATURES_CHROMATIC_INDEX.hasOwnProperty(newKey)) {
         currentKey = newKey;
-
-        const existingTempOption = keySelector.querySelector('[data-temporary="true"]');
-        if (existingTempOption) {
-            existingTempOption.remove();
-        }
-
-        const isStandardKey = [...keySelector.options].some(option => option.value === newKey);
-
-        if (!isStandardKey) {
-            const tempOption = document.createElement('option');
-            tempOption.value = newKey;
-            tempOption.textContent = newKey;
-            tempOption.dataset.temporary = "true";
-            keySelector.insertBefore(tempOption, keySelector.firstChild);
-        }
-
-        keySelector.value = newKey;
+        keySignatureDisplay.textContent = newKey;
         
         applyNoteColors();
         applyChordColors();
@@ -1459,7 +1444,7 @@ document.addEventListener('DOMContentLoaded', () => {
   uploadControls.classList.remove('show');
   saveLoadBtn.classList.remove('active');
   
-  if (keySelector) keySelector.value = currentKey;
+  keySignatureDisplay.textContent = currentKey;
   document.body.setAttribute('tabindex', '0');
   
   // Load default song
@@ -1511,6 +1496,11 @@ deleteBtn.addEventListener('click', handleDeleteClick);
 enterKeyBtn.addEventListener('click', handleEnterKeyClick);
 editToggleBtn.addEventListener('click', toggleEditMode);
 saveLoadBtn.addEventListener('click', toggleSaveLoadMode);
+
+keySignatureDisplay.addEventListener('click', () => {
+    keySignaturePopup.classList.toggle('show');
+    keySignatureDisplay.classList.toggle('active');
+});
 
 preloadedSongsSelector.addEventListener('change', (event) => {
     const songKey = event.target.value;
@@ -1589,7 +1579,6 @@ accidentalToggle.addEventListener('click', (event) => {
   applyActiveAccidentalToCurrentNote(); 
 });
 
-keySelector.addEventListener('change', (event) => changeKey(event.target.value));
 document.addEventListener('click', (event) => {
   if (currentlyEditingText && !event.target.closest('.syllable.editing') && !isAdvancingToNext) finishTextEdit();
   if (!event.target.closest('#deleteBtn') && deleteConfirmationState) {
@@ -1597,6 +1586,10 @@ document.addEventListener('click', (event) => {
   }
   if (!event.target.closest('#enterKeyBtn')) {
     resetEnterKeyState();
+  }
+  if (!event.target.closest('.key-signature-group')) {
+      keySignaturePopup.classList.remove('show');
+      keySignatureDisplay.classList.remove('active');
   }
 });
 
