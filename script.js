@@ -1073,7 +1073,6 @@ function toggleEditMode() {
   updateEditOnlyControlsVisibility();
   updateAddButtonState();
   updateDeleteButtonState();
-  updateNewLineButtonState();
   updateEnterKeyButtonState();
 }
 function toggleSaveLoadMode() {
@@ -1114,8 +1113,8 @@ function updateDeleteButtonState() {
   deleteBtn.classList.toggle('active', editModeCheckbox.checked && currentSyllableIndex >= 0);
 }
 function updateNewLineButtonState() {
-  newLineBtn.disabled = !editModeCheckbox.checked;
-  newLineBtn.classList.toggle('active', editModeCheckbox.checked);
+    newLineBtn.disabled = false; // Always enabled
+    newLineBtn.classList.add('active'); // Always visually active
 }
 function updateEnterKeyButtonState() {
     enterKeyBtn.disabled = !editModeCheckbox.checked || currentSyllableIndex < 0;
@@ -1187,8 +1186,6 @@ function loadPreloadedSong(songKey) {
 
 // ===== NEW LINE POPUP FUNCTIONS =====
 function showNewLinePopup() {
-    if (!editModeCheckbox.checked) return;
-
     let bodyText = '';
     const lines = document.querySelectorAll('.notation-line');
 
@@ -1543,7 +1540,6 @@ editModeCheckbox.addEventListener('change', () => {
   updateEditOnlyControlsVisibility();
   updateAddButtonState(); 
   updateDeleteButtonState();
-  updateNewLineButtonState();
   updateEnterKeyButtonState();
   if (!editModeCheckbox.checked) {
     resetAccidentalToggleVisuals();
