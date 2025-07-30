@@ -255,7 +255,6 @@ const editModeCheckbox = document.getElementById('editMode');
 const editToggleBtn = document.getElementById('editToggle');
 const leftArrowBtn = document.getElementById('leftArrow');
 const rightArrowBtn = document.getElementById('rightArrow');
-const infoIcon = document.getElementById('infoIcon');
 const hints = document.getElementById('hints');
 const minimizeBtn = document.getElementById('minimizeBtn');
 const controlsGroup = document.getElementById('controlsGroup');
@@ -286,7 +285,6 @@ let currentSyllableIndex = -1;
 let currentRowTop = null; // To track the vertical position of the current visual row
 let navigationOffEndState = null;
 let clickTimer = null;
-let infoVisible = false;
 let controlsMinimized = false;
 let currentlyEditingText = null;
 let currentEditingIndex = -1;
@@ -1105,11 +1103,6 @@ function toggleChords() {
   updateChordBoxesVisibility();
   console.log(`Chord mode ${chordMode ? 'enabled' : 'disabled'}`);
 }
-function toggleInfo() {
-  infoVisible = !infoVisible;
-  hints.classList.toggle('show', infoVisible);
-  infoIcon.classList.toggle('active', infoVisible);
-}
 function toggleMinimize() {
   controlsMinimized = !controlsMinimized;
   controlsGroup.classList.toggle('minimized', controlsMinimized);
@@ -1502,7 +1495,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== EVENT LISTENERS =====
-infoIcon.addEventListener('click', toggleInfo);
 minimizeBtn.addEventListener('click', toggleMinimize);
 nameToggle.addEventListener('click', toggleNames);
 chordToggle.addEventListener('click', toggleChords);
