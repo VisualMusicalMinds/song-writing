@@ -1205,3 +1205,35 @@ body:not(.chord-mode-active) .floating-navigation {
 .submit-btn:hover {
   background-color: #0056b3;
 }
+.copy-icon {
+  cursor: pointer;
+  color: #6c757d;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.copy-icon:hover {
+  color: #007bff;
+  transform: scale(1.1);
+}
+
+.copy-icon .copy-icon-check {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.copy-icon .copy-icon-original {
+  transition: opacity 0.3s ease;
+}
+
+.copy-icon.copied {
+  color: #28a745; /* Green for success */
+  transform: scale(1.1);
+}
+
+.copy-icon.copied .copy-icon-original {
+  opacity: 0;
+}
+
+.copy-icon.copied .copy-icon-check {
+  opacity: 1;
+}
