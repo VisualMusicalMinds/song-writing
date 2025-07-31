@@ -521,7 +521,6 @@ body:not(.chord-mode-active) .floating-navigation {
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
-
 /* ===== KEY SIGNATURE CUSTOM COMPONENT ===== */
 .key-signature-group {
     position: relative;
@@ -686,8 +685,9 @@ body:not(.chord-mode-active) .floating-navigation {
     color: white;
 }
 
-#copyVisualBtn.active, #copyVisualBtn:hover {
+#copyVisualBtn:hover {
     filter: brightness(1.1);
+    transform: scale(1.05);
 }
 
 .icon-btn .glasses-icon {
@@ -906,33 +906,7 @@ body:not(.chord-mode-active) .floating-navigation {
 }
 
 .info-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background-color: #007bff;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
-  margin-left: 4px;
-}
-
-.info-icon:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.info-icon.active {
-  background-color: #28a745;
-}
-
-.info-icon.active:hover {
-  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  display: none;
 }
 
 /* ===== NEW LINE BUTTON ===== */
@@ -1016,4 +990,14 @@ body:not(.chord-mode-active) .floating-navigation {
 @keyframes yellowPulse {
   0% {
     box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4),
-[...]
+                0 0 0 6px rgba(255, 193, 7, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.6),
+                0 0 0 12px rgba(255, 193, 7, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4),
+                0 0 0 6px rgba(255, 193, 7, 0.2);
+  }
+}
