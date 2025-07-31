@@ -234,6 +234,23 @@ body.capturing {
   transform: scale(1.02);
 }
 
+/* ===== PRELOADED SONGS SELECTOR ===== */
+#preloadedSongsSelector {
+    font-size: 14px;
+    height: 32px;
+    padding: 0 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+#preloadedSongsSelector:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
 /* ===== BOTTOM CONTROLS ===== */
 .bottom-controls-group {
   position: fixed;
