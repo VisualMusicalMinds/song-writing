@@ -12,7 +12,7 @@ Ed-[M1] it[F1] mode[S1] is[D2] where[L1] it's[D2] at![S1] Turn[S1] notes[F1] sha
 [Save Features]
 When[M1] you[F1] want[S1] to[D2] load[L1] or[D2] save,[S1] in[S1] this[F1] app[M1] there's[S1] a[S1] spe-[R1] cial[S1] way.[D1] Un-[M1] der[F1] Save[S1] there's[D2] the[D2] Add[L1] Text[D2] key,[S1] and[S1] in[S1] it's[F1] win-[M1] dow[S1] you[R1] will[S1] see[D1] some[R1] text[R1] you[R1] should[R1] copy[M1] and[S1] keep,[R1] paste[R1] it[R1] back[D1] later,[T-1] you[R1] won't[R1] miss[L-1] a[R1] beat.[T-1] But[T-1] if[D1] visuals[R1] are[D1] what[T-1] you[S1] want,[R1] the[R1] camera[R1] icon[M1] will[M1] save[M1] this[M1] score[M1] as[M1] a[M1] image[M1] on[M1] your[M1] clipboard[F#1] and[F#1] you[F#1] can[F#1] paste[F#1] it[F#1] in[F#1] a[F#1] dif-[F#1] -ferent[F#1] do-[S1] cu-[S1] ment![S1]
 [Googles]
-Now[M1] the[F1] last[S1] this[D2] left[L1] to[D2] see[S1] are[S1] the[F1] goo-[M1] gles[S1] to[R1] the[S1] right.[D1] Try[M1] them[F1] out[S1] and[D2] you[L1] will[D2] see,[S1] all[S1] the[S1] notes[L1] in[L1] ev-[T1] ery[T1] key![D2]`,
+Now[M1] the[F1] last[S1] thing[D2] left[L1] to[D2] see[S1] are[S1] the[F1] goo-[M1] gles[S1] to[R1] the[S1] right.[D1] Try[M1] them[F1] out[S1] and[D2] you[L1] will[D2] see,[S1] all[S1] the[S1] notes[L1] in[L1] ev-[T1] ery[T1] key![D2]`,
     'twinkle': `[Key of C]
 [A]
 Twin[D1] kle,[D1] twin[S1] kle,[S1] lit[L1] tle[L1] star[S1] How[F1] I[F1] won[M1] der[M1] what[R1] you[R1] are[D1]
