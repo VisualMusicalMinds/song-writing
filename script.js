@@ -272,7 +272,6 @@ const submitNewLine = document.getElementById('submitNewLine');
 const editOnlyControls = document.getElementById('editOnlyControls');
 const chordToggle = document.getElementById('chordToggle');
 const chordBoxes = document.getElementById('chordBoxes');
-const popupModeToggle = document.querySelector('.popup-mode-toggle');
 const copyLyricsBtn = document.getElementById('copyLyricsBtn');
 const enterKeyBtn = document.getElementById('enterKeyBtn');
 const copyVisualBtn = document.getElementById('copyVisualBtn');
@@ -292,7 +291,6 @@ let isAdvancingToNext = false;
 let deleteConfirmationState = false;
 let enterKeyState = 0; // 0: grey, 1: yellow (confirm), 2: green (active)
 const DOUBLE_CLICK_DELAY = 300;
-let newLineMode = 'add'; // 'add' or 'replace'
 
 // ===== UTILITY FUNCTIONS =====
 function getAllSyllables() {
@@ -1216,10 +1214,6 @@ function showNewLinePopup() {
     newLineText.value = fullText;
     newLineText.focus();
     newLineText.select();
-
-    newLineMode = 'replace';
-    popupModeToggle.querySelector('[data-mode="replace"]').classList.add('active');
-    popupModeToggle.querySelector('[data-mode="add"]').classList.remove('active');
 }
 
 function hideNewLinePopup() {
@@ -1468,14 +1462,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
   document.querySelectorAll('.chord-box').forEach(chordBox => {
     chordBox.addEventListener('click', () => handleChordBoxClick(chordBox));
-  });
-
-  popupModeToggle.addEventListener('click', (event) => {
-    const clickedButton = event.target.closest('.popup-mode-btn');
-    if (!clickedButton) return;
-    newLineMode = clickedButton.dataset.mode;
-    popupModeToggle.querySelectorAll('.popup-mode-btn').forEach(btn => btn.classList.remove('active'));
-    clickedButton.classList.add('active');
   });
 
   copyLyricsBtn.addEventListener('click', () => {
