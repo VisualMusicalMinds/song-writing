@@ -47,6 +47,11 @@ body.capturing {
   transition: background-color 0.5s ease;
 }
 
+.notation-container.colors-inactive .notation-line {
+    background-color: #ffffff !important;
+}
+
+
 .notation-line.section-break {
     margin-top: 1px;
 }
@@ -1000,17 +1005,17 @@ body:not(.chord-mode-active) .floating-navigation {
   color: currentColor;
 }
 
-.enter-key-btn:hover {
-  filter: brightness(1.1);
-  transform: scale(1.05);
-}
-
 .enter-key-btn.confirm-enter {
   background-color: #ffc107;
 }
 
 .enter-key-btn.active-enter {
   background-color: #28a745;
+}
+
+.enter-key-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
 }
 
 .enter-key-btn:disabled {
@@ -1025,50 +1030,17 @@ body:not(.chord-mode-active) .floating-navigation {
   transform: none;
 }
 
-/* ===== HINTS SECTION ===== */
-.hints {
-  text-align: center;
-  font-size: 12px;
-  color: #888;
-  margin-top: 10px;
-  user-select: none;
-  pointer-events: none;
-  opacity: 0;
-  max-height: 0;
-  transition: all 0.3s ease;
-}
-
-.bottom-controls-group:not(.minimized) .hints {
-  opacity: 1;
-  max-height: 50px;
-}
-
-.edit-hint, .keyboard-hint {
-  transition: opacity 0.3s ease, max-height 0.3s ease;
-  overflow: hidden;
-}
-
-.edit-hint {
-  opacity: 0;
-  max-height: 0;
-}
-
-.edit-only-controls.show ~ .standard-controls ~ .hints .edit-hint {
-  opacity: 1;
-  max-height: 20px;
-}
-
-/* ===== NEW LINE POPUP ===== */
+/* ===== POPUP STYLES ===== */
 .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     z-index: 200;
     opacity: 0;
     visibility: hidden;
@@ -1081,13 +1053,13 @@ body:not(.chord-mode-active) .floating-navigation {
 }
 
 .popup-content {
-    background-color: #fff;
+    background: #fff;
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
     width: 90%;
     max-width: 500px;
-    transform: scale(0.95);
+    transform: scale(0.9);
     transition: transform 0.3s ease;
 }
 
@@ -1099,37 +1071,68 @@ body:not(.chord-mode-active) .floating-navigation {
     margin-top: 0;
     margin-bottom: 15px;
     color: #333;
-    font-size: 20px;
 }
 
-#newLineText {
+.popup-content textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: inherit;
     font-size: 14px;
     box-sizing: border-box;
     resize: vertical;
-    min-height: 120px;
 }
 
 .popup-buttons {
-    margin-top: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 20px;
 }
 
 .popup-action-buttons {
     display: flex;
     gap: 10px;
-    align-items: center;
+    margin-left: auto;
+}
+
+.popup-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.popup-btn.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.popup-btn.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.popup-btn.submit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.popup-btn.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.popup-btn:active {
+    transform: scale(0.97);
 }
 
 .copy-icon {
     cursor: pointer;
     color: #6c757d;
-    transition: all 0.2s ease;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .copy-icon:hover {
@@ -1139,85 +1142,210 @@ body:not(.chord-mode-active) .floating-navigation {
 
 .copy-icon.copied {
     color: #28a745;
+    animation: bounce 0.5s;
 }
 
-.popup-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
-.cancel-btn {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    border: 1px solid #dee2e6;
-}
-
-.cancel-btn:hover {
-    background-color: #e2e6ea;
-}
-
-.submit-btn {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.submit-btn:hover {
-    background-color: #0056b3;
-}
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
-  .main-container {
-    padding-bottom: 180px; 
-  }
+    .main-container {
+        padding-bottom: 180px; /* More space for controls on mobile */
+    }
 
-  .bottom-controls {
+    .bottom-controls {
+        padding: 10px;
+        width: calc(100vw - 20px); /* Adjust width for smaller screens */
+    }
+
+    .floating-navigation {
+        /* Example: Adjust vertical position for tablets */
+        transform: translateY(15px);
+    }
+    body:not(.chord-mode-active) .floating-navigation {
+        /* Example: Adjust vertical position for tablets when chords are hidden */
+        transform: translateY(45px);
+    }
+
+    .key-signature-popup {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-navigation {
+        /* Example: Adjust vertical position for mobile */
+        transform: translateY(10px);
+    }
+    body:not(.chord-mode-active) .floating-navigation {
+        /* Example: Adjust vertical position for mobile when chords are hidden */
+        transform: translateY(40px);
+    }
+
+    .arrow-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .bottom-controls {
+        gap: 5px;
+    }
+
+    .edit-controls {
+        gap: 4px;
+    }
+}
+
+.color-scheme-toggle {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #f8f9fa;
+    width: 32px;
+    height: 32px;
+}
+
+.color-scheme-toggle .color-scheme-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.color-scheme-toggle.active {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.notation-container.colors-inactive .note {
+    background-color: #cccccc !important;
+}
+
+.notation-container.colors-inactive .letter-name {
+    color: #888888 !important;
+}
+
+/* Add this to your existing CSS file */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.popup-overlay.show .popup-content {
+    transform: scale(1);
+}
+
+.popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.popup-content textarea {
+    width: 100%;
     padding: 10px;
-  }
-
-  .edit-controls {
-    gap: 4px;
-  }
-
-  .key-signature-popup {
-    flex-wrap: wrap;
-    max-width: 280px;
-    justify-content: center;
-  }
-
-  .chord-boxes {
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: center;
-  }
-
-  .chord-box {
-    padding: 6px 10px;
-    font-size: 12px;
-    min-width: 35px;
-  }
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: vertical;
 }
 
-/* ===== COLOR SCHEME TOGGLE BUTTON ===== */
-#colorSchemeToggle {
-    background-color: #d4edda; /* Light green for active state */
-    border: 2px solid #28a745;
+.popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
 }
 
-#colorSchemeToggle:not(.active) {
-    background-color: #f0f0f0; /* Light grey for inactive state */
-    border-color: #dcdcdc;
+.popup-action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
 }
 
-.color-scheme-icon path {
-    transition: fill 0.3s ease;
+.popup-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#colorSchemeToggle:not(.active) .color-scheme-icon path {
-    fill: #a9a9a9; /* Muted grey for inactive icon */
+.popup-btn.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.popup-btn.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.popup-btn.submit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.popup-btn.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.popup-btn:active {
+    transform: scale(0.97);
+}
+
+.copy-icon {
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.copy-icon:hover {
+    color: #007bff;
+    transform: scale(1.1);
+}
+
+.copy-icon.copied {
+    color: #28a745;
+    animation: bounce 0.5s;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
