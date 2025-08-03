@@ -202,6 +202,7 @@ let accidentalMode = 'natural';
 let chordMode = false;
 let selectedChord = null;
 let saveLoadMode = false;
+let colorSchemeActive = false;
 
 const A4_HZ = 440.0;
 const SEMITONES_IN_OCTAVE = 12;
@@ -278,6 +279,7 @@ const copyVisualBtn = document.getElementById('copyVisualBtn');
 const saveLoadBtn = document.getElementById('saveLoadBtn');
 const uploadControls = document.getElementById('uploadControls');
 const preloadedSongsSelector = document.getElementById('preloadedSongsSelector');
+const colorSchemeToggle = document.getElementById('colorSchemeToggle');
 
 // ===== STATE VARIABLES =====
 let currentSyllableIndex = -1;
@@ -1101,6 +1103,12 @@ function toggleChords() {
   updateChordBoxesVisibility();
   console.log(`Chord mode ${chordMode ? 'enabled' : 'disabled'}`);
 }
+function toggleColorScheme() {
+    colorSchemeActive = !colorSchemeActive;
+    colorSchemeToggle.classList.toggle('active', colorSchemeActive);
+    console.log(`Color scheme toggle ${colorSchemeActive ? 'activated' : 'deactivated'}`);
+    // Add any logic here that should happen when the button is toggled
+}
 function toggleMinimize() {
   controlsMinimized = !controlsMinimized;
   controlsGroup.classList.toggle('minimized', controlsMinimized);
@@ -1484,6 +1492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 minimizeBtn.addEventListener('click', toggleMinimize);
 nameToggle.addEventListener('click', toggleNames);
 chordToggle.addEventListener('click', toggleChords);
+colorSchemeToggle.addEventListener('click', toggleColorScheme);
 leftArrowBtn.addEventListener('click', navigateLeft);
 rightArrowBtn.addEventListener('click', navigateRight);
 addBtn.addEventListener('click', addSyllableAfterCurrent);
