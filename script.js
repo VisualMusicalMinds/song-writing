@@ -202,7 +202,7 @@ let accidentalMode = 'natural';
 let chordMode = false;
 let selectedChord = null;
 let saveLoadMode = false;
-let colorSchemeActive = false;
+let colorSchemeActive = true; // Set to active by default
 
 const A4_HZ = 440.0;
 const SEMITONES_IN_OCTAVE = 12;
@@ -457,7 +457,11 @@ function updateAllLineHeights() {
 function updateLineBackgrounds() {
     const lines = document.querySelectorAll('.notation-line');
     lines.forEach((line, index) => {
-        line.style.backgroundColor = LINE_COLORS[index % LINE_COLORS.length];
+        if (colorSchemeActive) {
+            line.style.backgroundColor = LINE_COLORS[index % LINE_COLORS.length];
+        } else {
+            line.style.backgroundColor = '#ffffff';
+        }
     });
 }
 
@@ -1106,8 +1110,8 @@ function toggleChords() {
 function toggleColorScheme() {
     colorSchemeActive = !colorSchemeActive;
     colorSchemeToggle.classList.toggle('active', colorSchemeActive);
-    console.log(`Color scheme toggle ${colorSchemeActive ? 'activated' : 'deactivated'}`);
-    // Add any logic here that should happen when the button is toggled
+    updateLineBackgrounds();
+    console.log(`Color scheme colors ${colorSchemeActive ? 'enabled' : 'disabled'}`);
 }
 function toggleMinimize() {
   controlsMinimized = !controlsMinimized;
@@ -1454,6 +1458,10 @@ document.addEventListener('DOMContentLoaded', () => {
   updateChordBoxesVisibility();
   syncEditButtonState();
   
+  // Set color scheme toggle to active by default
+  colorSchemeToggle.classList.add('active');
+  updateLineBackgrounds();
+
   uploadControls.classList.remove('show');
   saveLoadBtn.classList.remove('active');
   
