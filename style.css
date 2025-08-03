@@ -68,6 +68,10 @@ body.capturing {
     transition: all 0.3s ease;
 }
 
+.notation-container.colors-inactive .line-label {
+    visibility: hidden;
+}
+
 .line-label::placeholder {
     color: #aaa;
     font-style: italic;
