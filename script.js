@@ -795,6 +795,12 @@ function createNewLineFromText(text, mode = 'add') {
 
     lines.forEach(lineText => {
         const trimmedLine = lineText.trim();
+        
+        // Skip the [Key of ...] line if it exists
+        if (trimmedLine.startsWith('[Key of')) {
+            return;
+        }
+
         const labelMatch = trimmedLine.match(/^\[(.*)\]$/);
 
         if (labelMatch) {
@@ -1179,7 +1185,7 @@ function loadSongFromText(text) {
         songText = '[New Line]\n' + songText;
     }
     
-    createNewLineFromText(text, 'replace');
+    createNewLineFromText(songText, 'replace');
 }
 
 function loadPreloadedSong(songKey) {
