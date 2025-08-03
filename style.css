@@ -1201,15 +1201,19 @@ body:not(.chord-mode-active) .floating-navigation {
 
 /* ===== COLOR SCHEME TOGGLE BUTTON ===== */
 #colorSchemeToggle {
-    background-color: #f0f0f0; /* Light grey for inactive state */
-    border: 2px solid #dcdcdc;
-}
-
-#colorSchemeToggle.active {
     background-color: #d4edda; /* Light green for active state */
-    border-color: #28a745;
+    border: 2px solid #28a745;
 }
 
-.color-scheme-icon {
-    transition: all 0.3s ease;
+#colorSchemeToggle:not(.active) {
+    background-color: #f0f0f0; /* Light grey for inactive state */
+    border-color: #dcdcdc;
+}
+
+.color-scheme-icon path {
+    transition: fill 0.3s ease;
+}
+
+#colorSchemeToggle:not(.active) .color-scheme-icon path {
+    fill: #a9a9a9; /* Muted grey for inactive icon */
 }
