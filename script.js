@@ -252,11 +252,11 @@ const shorthandToNoteMap = {
 const LINE_COLORS = ['#f5f5f5', '#f0f8ff', '#fff0f5', '#f0fff0'];
 
 // ===== ELEMENT REFERENCES =====
+const notationContainer = document.querySelector('.notation-container');
 const editModeCheckbox = document.getElementById('editMode');
 const editToggleBtn = document.getElementById('editToggle');
 const leftArrowBtn = document.getElementById('leftArrow');
 const rightArrowBtn = document.getElementById('rightArrow');
-const hints = document.getElementById('hints');
 const minimizeBtn = document.getElementById('minimizeBtn');
 const controlsGroup = document.getElementById('controlsGroup');
 const nameToggle = document.getElementById('nameToggle');
@@ -376,7 +376,6 @@ async function captureVisual() {
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        const notationContainer = document.querySelector('.notation-container');
         const canvas = await html2canvas(notationContainer, {
             backgroundColor: '#fafafa',
             scale: 2,
@@ -783,8 +782,6 @@ function createNewSyllable(syllableText = '-', noteClass = 'do') {
 }
 
 function createNewLineFromText(text, mode = 'add') {
-    const notationContainer = document.querySelector('.notation-container');
-
     if (mode === 'replace') {
         notationContainer.innerHTML = '';
         currentSyllableIndex = -1;
@@ -870,7 +867,7 @@ function addSyllableAfterCurrent() {
       targetSyllable = lastLineSyllables.length > 0 ? lastLineSyllables[lastLineSyllables.length - 1] : null;
     } else { 
         targetLine = createNewLineElement();
-        document.querySelector('.notation-container').appendChild(targetLine);
+        notationContainer.appendChild(targetLine);
         updateLineBackgrounds();
         updateLineHeight(targetLine);
     }
@@ -1110,6 +1107,7 @@ function toggleChords() {
 function toggleColorScheme() {
     colorSchemeActive = !colorSchemeActive;
     colorSchemeToggle.classList.toggle('active', colorSchemeActive);
+    notationContainer.classList.toggle('colors-inactive', !colorSchemeActive);
     updateLineBackgrounds();
     console.log(`Color scheme colors ${colorSchemeActive ? 'enabled' : 'disabled'}`);
 }
@@ -1181,7 +1179,7 @@ function loadSongFromText(text) {
         songText = '[New Line]\n' + songText;
     }
     
-    createNewLineFromText(songText, 'replace');
+    createNewLineFromText(text, 'replace');
 }
 
 function loadPreloadedSong(songKey) {
