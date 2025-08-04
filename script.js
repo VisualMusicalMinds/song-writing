@@ -1113,7 +1113,7 @@ function toggleChords() {
 function toggleColorScheme() {
     colorSchemeActive = !colorSchemeActive;
     colorSchemeToggle.classList.toggle('active', colorSchemeActive);
-    notationContainer.classList.toggle('colors-inactive', !colorSchemeActive);
+    document.body.classList.toggle('colors-inactive', !colorSchemeActive);
     updateLineBackgrounds();
     console.log(`Color scheme colors ${colorSchemeActive ? 'enabled' : 'disabled'}`);
 }
