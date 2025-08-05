@@ -47,7 +47,7 @@ body.capturing {
   transition: background-color 0.5s ease;
 }
 
-.notation-container.colors-inactive .notation-line {
+body.colors-inactive .notation-line {
     background-color: #ffffff !important;
 }
 
@@ -73,7 +73,7 @@ body.capturing {
     transition: all 0.3s ease;
 }
 
-.notation-container.colors-inactive .line-label {
+body.colors-inactive .line-label {
     visibility: hidden;
 }
 
